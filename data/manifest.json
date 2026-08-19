@@ -1,19 +1,9 @@
 {
-  "tweet_files": [
-    "data/tweets-00.json",
-    "data/tweets-01.json",
-    "data/tweets-02.json",
-    "data/tweets-03.json",
-    "data/tweets-04.json"
-  ],
-  "ko_files": [
-    "data/ko-00.json",
-    "data/ko-01.json",
-    "data/ko-02.json",
-    "data/ko-03.json",
-    "data/ko-04.json"
-  ],
-  "tweet_count": 455,
-  "translation_count": 455,
-  "media_base": "media/"
+  "tweet_files": ["data/tweets-preview.json"],
+  "ko_files": ["data/ko-preview.json"],
+  "tweet_count": 10,
+  "translation_count": 10,
+  "full_archive_count": 455,
+  "media_base": "media/",
+  "status": "preview"
 }
