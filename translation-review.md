@@ -1,29 +1,38 @@
-# Translation review
+# Translation glossary — confirmed
 
-Please confirm the preferred Korean rendering for the following names / titles / fandom shorthand. Until confirmed, the archive keeps the Japanese form or a provisional transliteration.
+The following Korean renderings were confirmed by the archive owner and are authoritative for this site.
 
-| Japanese | Current / provisional Korean | Status |
-|---|---|---|
-| 橘めい | 타치바나 메이 | provisional |
-| 須賀蕾叶 / 蕾叶 | 스가 라이카 / 라이카 | confirm official reading/spelling |
-| 兎寝ちゃん | 우네짱 | confirm reading/spelling |
-| 家団 | 家団 (kept as-is) | confirm whether to localize |
-| 一家Dumb Rock! | 一家Dumb Rock! (kept as-is) | confirm official Korean title |
-| アワーノーツ | 아워 노츠 / アワーノーツ | confirm official Korean title |
-| バンドリ | 뱅드림! / バンドリ | confirm site-wide convention |
-| バチャガ | バチャガ (kept as-is) | identify official title / abbreviation |
-| 団ログ | 단로그 | confirm preferred rendering |
-| バンドリTVLIVE | 뱅드림! TV LIVE / バンドリTVLIVE | confirm official rendering |
-| 遠野さん | 토오노 씨 | confirm person’s full name / Korean spelling |
-| 花宮さん | 하나미야 씨 | confirm person’s full name / Korean spelling |
-| ゆめみた | 유메미타 | confirm official title / spelling |
-| DATEWARS / デートウォーズ | DATEWARS / 데이트 워즈 | confirm official Korean title |
-| ルルットリリィ | 루룻토 릴리 / ルルットリリィ | confirm official Korean title |
-| 風&リリィ | 카제 & 릴리 | confirm character naming |
-| てつりょー | てつりょー (kept as-is) | identify official title |
-| 水口未希 | 미즈구치 미키 | confirm official Korean spelling |
-| 光が死んだ夏 | 히카루가 죽은 여름 | likely official Korean title; confirm convention |
+| Japanese | Confirmed Korean |
+|---|---|
+| 須賀蕾叶 / 蕾叶 | 스가 라이카 / 라이카 |
+| 馬橋心玖 | 마하시 미쿠 |
+| 涼泉桜花 | 스즈미 사쿠라 |
+| 遠野さん | 토오노상 |
+| 花宮さん | 하나미야상 |
+| 水口未希 | 미즈구치 미키 |
+| 野々山 風 | 노노야마 후 |
+| こんぺとリリィ | 콤페토 리리 |
+| 佐多みさき | 사다 미사키 |
+| 少名毘古那守 兎寝 | 스쿠나히토나노카미 토네 |
+| 家団 | 家団 |
+| 一家Dumb Rock! | 일가덤락 |
+| アワーノーツ | 아워노츠 |
+| BanG Dream! Our Notes | BanG Dream! Our Notes |
+| バンドリ | 뱅드림 |
+| DATEWARS | DATEWARS |
+| デートウォーズ | 데이트 워즈 |
+| 魔法の姉妹ルルットリリィ | 마법의 자매 루루토 릴리 |
+| ルルットリリィ | 루루토 릴리 |
+| てつりょー！meet with 鉄道むすめ | 테츠료! meet with 철도무스메 |
+| 光が死んだ夏 | 히카루가 죽은 여름 |
+| バチャガ | 버츄얼 걸 |
+| 団ログ | 덤락 |
+| バンドリTVLIVE | 뱅드림 TV LIVE |
+| ゆめみた | 유메미타 |
+| 風&リリィ | 후 & 리리 |
 
-## Notes
-- Hashtags can remain in Japanese even when the body text is translated, so links/searchability are preserved.
-- Character names, work titles, event names, unit names, and abbreviations should use official Korean spellings when available.
+## Rules
+- These spellings override machine translation.
+- Apply the glossary only when the Japanese source actually contains the corresponding Japanese term.
+- Longer terms take priority over shorter overlapping terms.
+- Hashtags may remain in Japanese for searchability unless a separate rule is added.
