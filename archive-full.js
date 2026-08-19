@@ -1,10 +1,12 @@
 (async()=>{
   try{
     const m=await fetch('data/manifest.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(`manifest ${r.status}`);return r.json()});
-    if(!m.archive_file)return;
-    const b64=(await fetch(m.archive_file,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(`archive ${r.status}`);return r.text()})).replace(/\s/g,'');
+    const files=m.archive_parts||[];
+    if(!files.length)throw Error('archive parts missing');
+    const parts=await Promise.all(files.map(u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(`${u} ${r.status}`);return r.text()})));
+    const b64=parts.join('').replace(/\s/g,'');
     const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
-    if(!('DecompressionStream' in window))throw Error('이 브라우저가 압축 아카이브 해제를 지원하지 않습니다. 최신 브라우저로 열어주세요.');
+    if(!('DecompressionStream' in window))throw Error('gzip unsupported');
     const stream=new Blob([raw]).stream().pipeThrough(new DecompressionStream('gzip'));
     const posts=JSON.parse(await new Response(stream).text());
     if(!Array.isArray(posts)||posts.length!==455)throw Error(`archive count ${posts?.length||0}`);
