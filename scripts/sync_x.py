@@ -8,7 +8,7 @@ USERNAME=os.getenv('X_USERNAME','May_o_o_T')
 TOKEN=os.getenv('X_BEARER_TOKEN','').strip()
 OPENAI_KEY=os.getenv('OPENAI_API_KEY','').strip()
 TRANSLATE_MODEL=os.getenv('OPENAI_TRANSLATE_MODEL','gpt-5-mini')
-UA='Mozilla/5.0 MayArchiveBot/3.0'
+UA='Mozilla/5.0 MayArchiveBot/3.1'
 
 def read_json(path,default=None):
     try:return json.loads(path.read_text('utf-8'))
@@ -73,18 +73,24 @@ def download(url,path):
     if len(data)>90*1024*1024:return False
     path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data);return True
 
+def parse_time(created):
+    if isinstance(created,(int,float)):
+        return dt.datetime.fromtimestamp(created,dt.timezone.utc).astimezone(ZoneInfo('Asia/Tokyo'))
+    s=str(created or '')
+    try:return dt.datetime.fromisoformat(s.replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
+    except Exception:
+        try:return dt.datetime.strptime(s,'%a %b %d %H:%M:%S %z %Y').astimezone(ZoneInfo('Asia/Tokyo'))
+        except Exception:return dt.datetime.now(ZoneInfo('Asia/Tokyo'))
+
 def normalize_fx_post(x):
     tid=str(x.get('id') or '')
-    created=x.get('created_at') or x.get('date') or ''
-    if isinstance(created,(int,float)):
-        d=dt.datetime.fromtimestamp(created,dt.timezone.utc).astimezone(ZoneInfo('Asia/Tokyo'))
-    else:
-        try:d=dt.datetime.fromisoformat(str(created).replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
-        except Exception:d=dt.datetime.now(ZoneInfo('Asia/Tokyo'))
-    text=(x.get('text') or x.get('content') or '').strip()
-    m=x.get('metrics') or {}
-    media=((x.get('media') or {}).get('all') or x.get('media') or [])
-    if isinstance(media,dict):media=media.get('all') or []
+    d=parse_time(x.get('created_at') or x.get('created_timestamp'))
+    text=(x.get('text') or '').strip()
+    media_obj=x.get('media') or {}
+    if isinstance(media_obj,dict):
+        media=(media_obj.get('photos') or [])+(media_obj.get('videos') or [])
+    elif isinstance(media_obj,list):media=media_obj
+    else:media=[]
     paths=[]
     for i,item in enumerate(media,1):
         u,ext=best_fx_media(item or {})
@@ -93,28 +99,21 @@ def normalize_fx_post(x):
         try:
             if download(u,ROOT/rel):paths.append(rel)
         except Exception as e:print('media WARN',tid,repr(e))
-    return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':'橘めい','handle':USERNAME,'ja':text,'ko':translate_ko(text) if OPENAI_KEY else '','reply':m.get('replies',m.get('reply_count',0)),'retweet':m.get('retweets',m.get('retweet_count',0)),'favorite':m.get('likes',m.get('like_count',0)),'views':m.get('views',m.get('impression_count',0)),'has_media':bool(paths),'media':paths}
+    return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':(x.get('author') or {}).get('name') or '橘めい','handle':(x.get('author') or {}).get('screen_name') or USERNAME,'ja':text,'ko':translate_ko(text) if OPENAI_KEY else '','reply':x.get('replies',0) or 0,'retweet':x.get('reposts',0) or 0,'favorite':x.get('likes',0) or 0,'views':x.get('views',0) or 0,'has_media':bool(paths),'media':paths}
 
 def fetch_public_timeline():
-    urls=[
-        f'https://api.fxtwitter.com/2/profile/{urllib.parse.quote(USERNAME)}/statuses',
-        f'https://api.fxtwitter.com/{urllib.parse.quote(USERNAME)}'
-    ]
-    last=None
-    for u in urls:
-        try:
-            data=api_json(u)
-            candidates=[]
-            if isinstance(data,list):candidates=data
-            elif isinstance(data,dict):
-                for key in ('tweets','statuses','posts','data'):
-                    v=data.get(key)
-                    if isinstance(v,list):candidates=v;break
-                if not candidates and isinstance(data.get('timeline'),list):candidates=data['timeline']
-            if candidates:return candidates
-        except Exception as e:last=e;print('timeline WARN',u,repr(e))
-    if last:raise last
-    return []
+    found=[];cursor=None
+    for _ in range(10):
+        q={'count':'100'}
+        if cursor:q['cursor']=cursor
+        u=f'https://api.fxtwitter.com/2/profile/{urllib.parse.quote(USERNAME)}/statuses?'+urllib.parse.urlencode(q)
+        data=api_json(u)
+        results=data.get('results') or []
+        found.extend([x for x in results if isinstance(x,dict) and x.get('type','status')=='status'])
+        cursor=((data.get('cursor') or {}).get('bottom'))
+        if not cursor or not results:break
+        time.sleep(.2)
+    return found
 
 def fetch_official_api():
     auth={'Authorization':f'Bearer {TOKEN}'}
@@ -128,17 +127,14 @@ def fetch_official_api():
         payload=api_json(f'https://api.x.com/2/users/{uid}/tweets?'+urllib.parse.urlencode(q),auth)
         for m in (payload.get('includes') or {}).get('media',[]):media_by_key[m.get('media_key')]=m
         for x in payload.get('data') or []:
-            x['_media_by_key']=media_by_key
-            found.append(x)
+            x['_media_by_key']=dict(media_by_key);found.append(x)
         token=(payload.get('meta') or {}).get('next_token')
         if not token:break
         time.sleep(.3)
     return found
 
 def normalize_official(x):
-    tid=str(x['id']);text=((x.get('note_tweet') or {}).get('text') or x.get('text') or '').strip()
-    created=x.get('created_at') or dt.datetime.now(dt.timezone.utc).isoformat()
-    d=dt.datetime.fromisoformat(created.replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
+    tid=str(x['id']);text=((x.get('note_tweet') or {}).get('text') or x.get('text') or '').strip();d=parse_time(x.get('created_at'))
     metrics=x.get('public_metrics') or {};paths=[];media_by_key=x.get('_media_by_key') or {}
     for i,key in enumerate((x.get('attachments') or {}).get('media_keys') or [],1):
         m=media_by_key.get(key) or {};typ=m.get('type','')
@@ -154,22 +150,16 @@ def normalize_official(x):
 
 def main():
     manifest,posts=load_archive();known={str(p.get('id')) for p in posts}
-    raw=[];normalizer=normalize_fx_post
     try:
-        raw=fetch_public_timeline()
+        raw=fetch_public_timeline();normalizer=normalize_fx_post
+        print('FxTwitter timeline posts',len(raw))
     except Exception as e:
         print('public timeline failed',repr(e))
-        if TOKEN:
-            raw=fetch_official_api();normalizer=normalize_official
-        else:
-            raise SystemExit('Public timeline failed and no X_BEARER_TOKEN fallback is configured')
-    new=[]
-    for x in raw:
-        tid=str(x.get('id') or '')
-        if tid and tid not in known:new.append(x)
+        if not TOKEN:raise SystemExit('Public timeline failed and no X_BEARER_TOKEN fallback is configured')
+        raw=fetch_official_api();normalizer=normalize_official
+    new=[x for x in raw if str(x.get('id') or '') and str(x.get('id')) not in known]
     print('new X posts',len(new))
     if not new:return
-    converted=[normalizer(x) for x in reversed(new)]
-    posts.extend(converted);save_archive(manifest,posts)
+    posts.extend(normalizer(x) for x in reversed(new));save_archive(manifest,posts)
 
 if __name__=='__main__':main()
