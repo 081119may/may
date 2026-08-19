@@ -1,46 +1,279 @@
 {
-  "source_url":"https://www.amuse.co.jp/artist/A9019/index.html",
-  "updated_note_ja":"アミューズ公式プロフィールをもとに整理しています。",
-  "updated_note_ko":"아뮤즈 공식 프로필을 바탕으로 정리했습니다.",
-  "name_ja":"橘 めい","name_ko":"타치바나 메이","romanized":"Tachibana May",
-  "affiliation_ja":"アミューズクリエイティブスタジオ所属","affiliation_ko":"아뮤즈 크리에이티브 스튜디오 소속",
-  "occupation_ja":"声優","occupation_ko":"성우",
-  "profile_image_candidates":["assets/profile.jpg","https://pbs.twimg.com/profile_images/1906721413953933313/858Cl1ZU.jpg"],
-  "fields":[
-    {"label_ja":"性別","label_ko":"성별","value_ja":"女性","value_ko":"여성"},
-    {"label_ja":"生年月日","label_ko":"생년월일","value_ja":"2008年11月19日","value_ko":"2008년 11월 19일"},
-    {"label_ja":"年齢","label_ko":"나이","value_ja":"17歳","value_ko":"17세"},
-    {"label_ja":"出身地","label_ko":"출신지","value_ja":"東京都","value_ko":"도쿄도"},
-    {"label_ja":"身長","label_ko":"신장","value_ja":"168cm","value_ko":"168cm"},
-    {"label_ja":"血液型","label_ko":"혈액형","value_ja":"B","value_ko":"B형"},
-    {"label_ja":"特技","label_ko":"특기","value_ja":"ダンス・歌・スポーツ全般","value_ko":"댄스·노래·스포츠 전반"},
-    {"label_ja":"趣味","label_ko":"취미","value_ja":"観劇・読書・絵を描くこと","value_ko":"공연 관람·독서·그림 그리기"}
+  "source_url": "https://www.amuse.co.jp/artist/A9019/",
+  "updated_note_ja": "アミューズ公式プロフィールをもとに整理しています。",
+  "updated_note_ko": "아뮤즈 공식 프로필을 바탕으로 정리했습니다.",
+  "name_ja": "橘 めい",
+  "name_ko": "타치바나 메이",
+  "romanized": "Tachibana May",
+  "affiliation_ja": "アミューズクリエイティブスタジオ所属",
+  "affiliation_ko": "아뮤즈 크리에이티브 스튜디오 소속",
+  "occupation_ja": "声優",
+  "occupation_ko": "성우",
+  "profile_image_candidates": [
+    "assets/profile.jpg",
+    "https://pbs.twimg.com/profile_images/1906721413953933313/858Cl1ZU.jpg"
   ],
-  "voice_samples":[
-    {"id":"voice_sample_1","ja":"ボイスサンプル1","ko":"보이스 샘플 1","duration":"00:23","start":0,"end":23.832},
-    {"id":"voice_sample_2","ja":"ボイスサンプル2","ko":"보이스 샘플 2","duration":"00:31","start":23.832,"end":55.848},
-    {"id":"voice_sample_3","ja":"ボイスサンプル3","ko":"보이스 샘플 3","duration":"00:41","start":55.848,"end":97.776},
-    {"id":"voice_sample_4","ja":"ボイスサンプル4","ko":"보이스 샘플 4","duration":"00:35","start":97.776,"end":133.152},
-    {"id":"voice_sample_5","ja":"ボイスサンプル5","ko":"보이스 샘플 5","duration":"00:30","start":133.152,"end":163.752},
-    {"id":"narration","ja":"ナレーション","ko":"내레이션","duration":"00:31","start":163.752,"end":194.988}
+  "fields": [
+    {
+      "label_ja": "性別",
+      "label_ko": "성별",
+      "value_ja": "女性",
+      "value_ko": "여성"
+    },
+    {
+      "label_ja": "生年月日",
+      "label_ko": "생년월일",
+      "value_ja": "2008年11月19日",
+      "value_ko": "2008년 11월 19일"
+    },
+    {
+      "label_ja": "年齢",
+      "label_ko": "나이",
+      "value_ja": "17歳",
+      "value_ko": "17세"
+    },
+    {
+      "label_ja": "出身地",
+      "label_ko": "출신지",
+      "value_ja": "東京都",
+      "value_ko": "도쿄도"
+    },
+    {
+      "label_ja": "身長",
+      "label_ko": "신장",
+      "value_ja": "168cm",
+      "value_ko": "168cm"
+    },
+    {
+      "label_ja": "血液型",
+      "label_ko": "혈액형",
+      "value_ja": "B",
+      "value_ko": "B형"
+    },
+    {
+      "label_ja": "特技",
+      "label_ko": "특기",
+      "value_ja": "ダンス・歌・スポーツ全般",
+      "value_ko": "댄스·노래·스포츠 전반"
+    },
+    {
+      "label_ja": "趣味",
+      "label_ko": "취미",
+      "value_ja": "観劇・読書・絵を描くこと",
+      "value_ko": "공연 관람·독서·그림 그리기"
+    }
   ],
-  "upcoming":[
-    {"kind":"event","date":"2026-08-30","date_label_ja":"2026年8月30日 14:00 / 15:30","date_label_ko":"2026년 8월 30일 14:00 / 15:30","title_ja":"一家Dumb Rock! 1st Single リリース記念お渡し会","title_ko":"一家Dumb Rock! 1st Single 발매 기념 전달회","detail_ja":"ゲーマーズなんば店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。","detail_ko":"게이머즈 난바점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.","url":"https://www.gamers.co.jp/contents/event_fair/detail.php?id=7680"},
-    {"kind":"event","date":"2026-09-12","date_label_ja":"2026年9月12日 14:00 / 15:30","date_label_ko":"2026년 9월 12일 14:00 / 15:30","title_ja":"一家Dumb Rock! 1st Single リリース記念お渡し会","title_ko":"一家Dumb Rock! 1st Single 발매 기념 전달회","detail_ja":"タワーレコード川崎店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。","detail_ko":"타워레코드 가와사키점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.","url":"https://cdfront.tower.jp/store/event/2026/09/0220912"},
-    {"kind":"event","date":"2026-09-13","date_label_ja":"2026年9月13日 13:30 / 15:00","date_label_ko":"2026년 9월 13일 13:30 / 15:00","title_ja":"一家Dumb Rock! 1st Single リリース記念お渡し会","title_ko":"一家Dumb Rock! 1st Single 발매 기념 전달회","detail_ja":"タワーレコード錦糸町パルコ店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。","detail_ko":"타워레코드 긴시초 PARCO점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.","url":"https://cdfront.tower.jp/store/event/2026/09/1450913idr"},
-    {"kind":"event","date":"2026-09-19","date_label_ja":"2026年9月19日 14:00 / 15:30","date_label_ko":"2026년 9월 19일 14:00 / 15:30","title_ja":"一家Dumb Rock! 1st Single リリース記念お渡し会","title_ko":"一家Dumb Rock! 1st Single 발매 기념 전달회","detail_ja":"アニメイト札幌 5Fイベントスペース。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。","detail_ko":"애니메이트 삿포로 5F 이벤트 스페이스. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.","url":"https://www.animate-onlineshop.jp/contents/fair_event/detail.php?id=115870"},
-    {"kind":"event","date":"2026-09-20","date_label_ja":"2026年9月20日 14:00 / 15:30","date_label_ko":"2026년 9월 20일 14:00 / 15:30","title_ja":"一家Dumb Rock! 1st Single リリース記念お渡し会","title_ko":"一家Dumb Rock! 1st Single 발매 기념 전달회","detail_ja":"タワーレコード札幌パルコ店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。","detail_ko":"타워레코드 삿포로 PARCO점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.","url":"https://bushiroad-music.com/22115/"},
-    {"kind":"broadcast","date":"2026-10-01","date_label_ja":"2026年10月〜","date_label_ko":"2026년 10월~","title_ja":"TVアニメ『魔法の姉妹ルルットリリィ』第2クール","title_ko":"TV 애니메이션 『魔法の姉妹ルルットリリィ』 제2쿨","detail_ja":"第2クールが2026年10月より放送。橘めい：野々山 風＆こんぺとリリィ役。","detail_ko":"제2쿨이 2026년 10월부터 방송. 타치바나 메이: 野々山 風 & こんぺとリリィ 역.","url":"https://www.luluttolilly.com"},
-    {"kind":"broadcast","date":"2026-10-01","date_label_ja":"2026年10月〜","date_label_ko":"2026년 10월~","title_ja":"TVアニメ『てつりょー！meet with 鉄道むすめ』","title_ko":"TV 애니메이션 『てつりょー！meet with 鉄道むすめ』","detail_ja":"2026年10月放送開始。橘めい：佐多みさき役。ED『わたし未来線』をてつりょー会（橘めい・庄子真央・福嶋晴菜・月城日花）が担当。","detail_ko":"2026년 10월 방송 시작. 타치바나 메이: 佐多みさき 역. ED 『わたし未来線』은 てつりょー会(타치바나 메이·庄子真央·福嶋晴菜·月城日花)가 담당.","url":"https://tetsuryo-anime.com/"},
-    {"kind":"event","date":"2026-11-01","date_label_ja":"2026年11月1日 昼14:30 / 夜18:30","date_label_ko":"2026년 11월 1일 낮 14:30 / 밤 18:30","title_ja":"VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ『HELLO WORLD！』","title_ko":"VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 『HELLO WORLD!』","detail_ja":"横浜ReNY beta。橘めい（マキ役）出演。昼の部14:00開場/14:30開演、夜の部18:00開場/18:30開演予定。","detail_ko":"요코하마 ReNY beta. 타치바나 메이(마키 역) 출연. 낮 14:00 개장/14:30 개연, 밤 18:00 개장/18:30 개연 예정.","url":"https://virtualgirl.bushiroad.com/news/post-19/"},
-    {"kind":"event","date":"2026-12-12","date_label_ja":"2026年12月12日","date_label_ko":"2026년 12월 12일","title_ja":"一家Dumb Rock! 1st LIVE","title_ko":"一家Dumb Rock! 1st LIVE","detail_ja":"duo MUSIC EXCHANGE。出演：一家Dumb Rock!／Gt.＆Vo. 須賀蕾叶役 橘めい、Gt.＆Vo. 馬橋心玖役 涼泉桜花。","detail_ko":"duo MUSIC EXCHANGE. 출연: 一家Dumb Rock! / Gt.&Vo. 須賀蕾叶 역 타치바나 메이, Gt.&Vo. 馬橋心玖 역 涼泉桜花.","url":"https://bang-dream.com/artist/ikka-dumb-rock/"}
+  "voice_samples": [
+    {
+      "id": "voice_sample_1",
+      "ja": "ボイスサンプル1",
+      "ko": "보이스 샘플 1",
+      "duration": "00:23",
+      "start": 0,
+      "end": 23.832
+    },
+    {
+      "id": "voice_sample_2",
+      "ja": "ボイスサンプル2",
+      "ko": "보이스 샘플 2",
+      "duration": "00:31",
+      "start": 23.832,
+      "end": 55.848
+    },
+    {
+      "id": "voice_sample_3",
+      "ja": "ボイスサンプル3",
+      "ko": "보이스 샘플 3",
+      "duration": "00:41",
+      "start": 55.848,
+      "end": 97.776
+    },
+    {
+      "id": "voice_sample_4",
+      "ja": "ボイスサンプル4",
+      "ko": "보이스 샘플 4",
+      "duration": "00:35",
+      "start": 97.776,
+      "end": 133.152
+    },
+    {
+      "id": "voice_sample_5",
+      "ja": "ボイスサンプル5",
+      "ko": "보이스 샘플 5",
+      "duration": "00:30",
+      "start": 133.152,
+      "end": 163.752
+    },
+    {
+      "id": "narration",
+      "ja": "ナレーション",
+      "ko": "내레이션",
+      "duration": "00:31",
+      "start": 163.752,
+      "end": 194.988
+    }
   ],
-  "information":[
-    {"type":"Live","subtype":"Event","date":"2026-06-15","title_ja":"VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ「HELLO WORLD！」 出演決定","title_ko":"VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 「HELLO WORLD!」 출연 결정","body_ja":"開催日：2026年11月1日（日）\n会場：横浜ReNY beta\n橘めい（マキ役）出演。","body_ko":"개최일: 2026년 11월 1일(일)\n장소: 요코하마 ReNY beta\n타치바나 메이(마키 역) 출연.","url":"https://virtualgirl.bushiroad.com/news/post-19/"},
-    {"type":"Media","subtype":"TV/WebTV","date":"2026-03-13","title_ja":"TOKYO MX TVアニメ「魔法の姉妹ルルットリリィ」 出演決定","title_ko":"TOKYO MX TV 애니메이션 「魔法の姉妹ルルットリリィ」 출연 결정","body_ja":"2026年4月5日（日）オンエアスタート。毎週日曜日22:30～。主演：野々山 風＆こんぺとリリィ役。","body_ko":"2026년 4월 5일(일) 방송 시작. 매주 일요일 22:30~. 주연: 野々山 風 & こんぺとリリィ 역.","url":"https://www.luluttolilly.com"},
-    {"type":"Live","subtype":"Event","date":"2026-01-19","title_ja":"「AnimeJapan 2026」 出演決定","title_ko":"「AnimeJapan 2026」 출연 결정","body_ja":"『魔法の姉妹ルルットリリィ』放送直前AJスペシャルステージ。2026年3月29日、BLUEステージ。","body_ko":"『魔法の姉妹ルルットリリィ』 방송 직전 AJ 스페셜 스테이지. 2026년 3월 29일, BLUE 스테이지.","url":"https://www.luluttolilly.com/news/detail.php?id=23052"},
-    {"type":"Live","subtype":"Event","date":"2026-01-12","title_ja":"MyGO!!!!!×Ave Mujica ツーマンライブ「moment / memory」 オープニングアクト出演決定","title_ko":"MyGO!!!!!×Ave Mujica 투맨 라이브 「moment / memory」 오프닝 액트 출연 결정","body_ja":"2026年3月1日、Kアリーナ横浜。一家Dumb Rock! Gt.＆Vo.須賀蕾叶役。","body_ko":"2026년 3월 1일, K 아레나 요코하마. 一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역.","url":"https://www.amuse.co.jp/artist/A9019/index.html"},
-    {"type":"Other","subtype":"Game","date":"2026-01-12","title_ja":"ゲーム「BanG Dream! Our Notes」 出演決定","title_ko":"게임 「BanG Dream! Our Notes」 출연 결정","body_ja":"一家Dumb Rock! Gt.＆Vo.須賀蕾叶役。","body_ko":"一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역.","url":"https://bang-dream.com/"}
+  "upcoming": [
+    {
+      "kind": "event",
+      "date": "2026-08-30",
+      "date_label_ja": "2026年8月30日 14:00 / 15:30",
+      "date_label_ko": "2026년 8월 30일 14:00 / 15:30",
+      "title_ja": "一家Dumb Rock! 1st Single リリース記念お渡し会",
+      "title_ko": "一家Dumb Rock! 1st Single 발매 기념 전달회",
+      "detail_ja": "ゲーマーズなんば店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。",
+      "detail_ko": "게이머즈 난바점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.",
+      "url": "https://www.gamers.co.jp/contents/event_fair/detail.php?id=7680"
+    },
+    {
+      "kind": "event",
+      "date": "2026-09-12",
+      "date_label_ja": "2026年9月12日 14:00 / 15:30",
+      "date_label_ko": "2026년 9월 12일 14:00 / 15:30",
+      "title_ja": "一家Dumb Rock! 1st Single リリース記念お渡し会",
+      "title_ko": "一家Dumb Rock! 1st Single 발매 기념 전달회",
+      "detail_ja": "タワーレコード川崎店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。",
+      "detail_ko": "타워레코드 가와사키점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.",
+      "url": "https://cdfront.tower.jp/store/event/2026/09/0220912"
+    },
+    {
+      "kind": "event",
+      "date": "2026-09-13",
+      "date_label_ja": "2026年9月13日 13:30 / 15:00",
+      "date_label_ko": "2026년 9월 13일 13:30 / 15:00",
+      "title_ja": "一家Dumb Rock! 1st Single リリース記念お渡し会",
+      "title_ko": "一家Dumb Rock! 1st Single 발매 기념 전달회",
+      "detail_ja": "タワーレコード錦糸町パルコ店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。",
+      "detail_ko": "타워레코드 긴시초 PARCO점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.",
+      "url": "https://cdfront.tower.jp/store/event/2026/09/1450913idr"
+    },
+    {
+      "kind": "event",
+      "date": "2026-09-19",
+      "date_label_ja": "2026年9月19日 14:00 / 15:30",
+      "date_label_ko": "2026년 9월 19일 14:00 / 15:30",
+      "title_ja": "一家Dumb Rock! 1st Single リリース記念お渡し会",
+      "title_ko": "一家Dumb Rock! 1st Single 발매 기념 전달회",
+      "detail_ja": "アニメイト札幌 5Fイベントスペース。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。",
+      "detail_ko": "애니메이트 삿포로 5F 이벤트 스페이스. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.",
+      "url": "https://www.animate-onlineshop.jp/contents/fair_event/detail.php?id=115870"
+    },
+    {
+      "kind": "event",
+      "date": "2026-09-20",
+      "date_label_ja": "2026年9月20日 14:00 / 15:30",
+      "date_label_ko": "2026년 9월 20일 14:00 / 15:30",
+      "title_ja": "一家Dumb Rock! 1st Single リリース記念お渡し会",
+      "title_ko": "一家Dumb Rock! 1st Single 발매 기념 전달회",
+      "detail_ja": "タワーレコード札幌パルコ店。橘めい（須賀蕾叶役）、涼泉桜花（馬橋心玖役）出演。",
+      "detail_ko": "타워레코드 삿포로 PARCO점. 타치바나 메이(須賀蕾叶 역), 涼泉桜花(馬橋心玖 역) 출연.",
+      "url": "https://bushiroad-music.com/22115/"
+    },
+    {
+      "kind": "broadcast",
+      "date": "2026-10-01",
+      "date_label_ja": "2026年10月〜",
+      "date_label_ko": "2026년 10월~",
+      "title_ja": "TVアニメ『魔法の姉妹ルルットリリィ』第2クール",
+      "title_ko": "TV 애니메이션 『魔法の姉妹ルルットリリィ』 제2쿨",
+      "detail_ja": "第2クールが2026年10月より放送。橘めい：野々山 風＆こんぺとリリィ役。",
+      "detail_ko": "제2쿨이 2026년 10월부터 방송. 타치바나 메이: 野々山 風 & こんぺとリリィ 역.",
+      "url": "https://www.luluttolilly.com"
+    },
+    {
+      "kind": "broadcast",
+      "date": "2026-10-01",
+      "date_label_ja": "2026年10月〜",
+      "date_label_ko": "2026년 10월~",
+      "title_ja": "TVアニメ『てつりょー！meet with 鉄道むすめ』",
+      "title_ko": "TV 애니메이션 『てつりょー！meet with 鉄道むすめ』",
+      "detail_ja": "2026年10月放送開始。橘めい：佐多みさき役。ED『わたし未来線』をてつりょー会（橘めい・庄子真央・福嶋晴菜・月城日花）が担当。",
+      "detail_ko": "2026년 10월 방송 시작. 타치바나 메이: 佐多みさき 역. ED 『わたし未来線』은 てつりょー会(타치바나 메이·庄子真央·福嶋晴菜·月城日花)가 담당.",
+      "url": "https://tetsuryo-anime.com/"
+    },
+    {
+      "kind": "event",
+      "date": "2026-11-01",
+      "date_label_ja": "2026年11月1日 昼14:30 / 夜18:30",
+      "date_label_ko": "2026년 11월 1일 낮 14:30 / 밤 18:30",
+      "title_ja": "VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ『HELLO WORLD！』",
+      "title_ko": "VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 『HELLO WORLD!』",
+      "detail_ja": "横浜ReNY beta。橘めい（マキ役）出演。昼の部14:00開場/14:30開演、夜の部18:00開場/18:30開演予定。",
+      "detail_ko": "요코하마 ReNY beta. 타치바나 메이(마키 역) 출연. 낮 14:00 개장/14:30 개연, 밤 18:00 개장/18:30 개연 예정.",
+      "url": "https://virtualgirl.bushiroad.com/news/post-19/"
+    },
+    {
+      "kind": "event",
+      "date": "2026-12-12",
+      "date_label_ja": "2026年12月12日",
+      "date_label_ko": "2026년 12월 12일",
+      "title_ja": "一家Dumb Rock! 1st LIVE",
+      "title_ko": "一家Dumb Rock! 1st LIVE",
+      "detail_ja": "duo MUSIC EXCHANGE。出演：一家Dumb Rock!／Gt.＆Vo. 須賀蕾叶役 橘めい、Gt.＆Vo. 馬橋心玖役 涼泉桜花。",
+      "detail_ko": "duo MUSIC EXCHANGE. 출연: 一家Dumb Rock! / Gt.&Vo. 須賀蕾叶 역 타치바나 메이, Gt.&Vo. 馬橋心玖 역 涼泉桜花.",
+      "url": "https://bang-dream.com/artist/ikka-dumb-rock/"
+    }
   ],
-  "related_topics":[{"date":"2026-06-15","title_ja":"《2026声優アーティスト育成プログラム・セレクション》開催決定！","title_ko":"《2026 성우 아티스트 육성 프로그램 셀렉션》 개최 결정!","url":"https://www.amuse.co.jp/topics/2026/06/_32026.html"}]
+  "information": [
+    {
+      "type": "Live",
+      "subtype": "Event",
+      "date": "2026-06-15",
+      "title_ja": "VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ「HELLO WORLD！」 出演決定",
+      "title_ko": "VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 「HELLO WORLD!」 출연 결정",
+      "body_ja": "開催日：2026年11月1日（日）\n会場：横浜ReNY beta\n橘めい（マキ役）出演。",
+      "body_ko": "개최일: 2026년 11월 1일(일)\n장소: 요코하마 ReNY beta\n타치바나 메이(마키 역) 출연.",
+      "url": "https://virtualgirl.bushiroad.com/news/post-19/"
+    },
+    {
+      "type": "Media",
+      "subtype": "TV/WebTV",
+      "date": "2026-03-13",
+      "title_ja": "TOKYO MX TVアニメ「魔法の姉妹ルルットリリィ」 出演決定",
+      "title_ko": "TOKYO MX TV 애니메이션 「魔法の姉妹ルルットリリィ」 출연 결정",
+      "body_ja": "2026年4月5日（日）オンエアスタート。毎週日曜日22:30～。主演：野々山 風＆こんぺとリリィ役。",
+      "body_ko": "2026년 4월 5일(일) 방송 시작. 매주 일요일 22:30~. 주연: 野々山 風 & こんぺとリリィ 역.",
+      "url": "https://www.luluttolilly.com"
+    },
+    {
+      "type": "Live",
+      "subtype": "Event",
+      "date": "2026-01-19",
+      "title_ja": "「AnimeJapan 2026」 出演決定",
+      "title_ko": "「AnimeJapan 2026」 출연 결정",
+      "body_ja": "『魔法の姉妹ルルットリリィ』放送直前AJスペシャルステージ。2026年3月29日、BLUEステージ。",
+      "body_ko": "『魔法の姉妹ルルットリリィ』 방송 직전 AJ 스페셜 스테이지. 2026년 3월 29일, BLUE 스테이지.",
+      "url": "https://www.luluttolilly.com/news/detail.php?id=23052"
+    },
+    {
+      "type": "Live",
+      "subtype": "Event",
+      "date": "2026-01-12",
+      "title_ja": "MyGO!!!!!×Ave Mujica ツーマンライブ「moment / memory」 オープニングアクト出演決定",
+      "title_ko": "MyGO!!!!!×Ave Mujica 투맨 라이브 「moment / memory」 오프닝 액트 출연 결정",
+      "body_ja": "2026年3月1日、Kアリーナ横浜。一家Dumb Rock! Gt.＆Vo.須賀蕾叶役。",
+      "body_ko": "2026년 3월 1일, K 아레나 요코하마. 一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역.",
+      "url": "https://www.amuse.co.jp/artist/A9019/index.html"
+    },
+    {
+      "type": "Other",
+      "subtype": "Game",
+      "date": "2026-01-12",
+      "title_ja": "ゲーム「BanG Dream! Our Notes」 出演決定",
+      "title_ko": "게임 「BanG Dream! Our Notes」 출연 결정",
+      "body_ja": "一家Dumb Rock! Gt.＆Vo.須賀蕾叶役。",
+      "body_ko": "一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역.",
+      "url": "https://bang-dream.com/"
+    }
+  ],
+  "related_topics": [
+    {
+      "date": "2026-06-15",
+      "title_ja": "《2026声優アーティスト育成プログラム・セレクション》開催決定！",
+      "title_ko": "《2026 성우 아티스트 육성 프로그램 셀렉션》 개최 결정!",
+      "url": "https://www.amuse.co.jp/topics/2026/06/_32026.html"
+    }
+  ],
+  "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
+  "auto_updated_at": "2026-08-19T21:56:05.424600+00:00"
 }
