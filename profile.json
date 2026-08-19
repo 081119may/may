@@ -1,34 +1,85 @@
 {
-  "source_url":"https://www.amuse.co.jp/artist/A9019/index.html",
-  "voice_embed_url":"https://otakotaku.com/ja/people/view/2677/may-tachibana",
-  "profile_image_candidates":[
-    "https://otakotaku.com/asset/img/people/2026/01/may-tachibana-696c29d637045p.jpg",
+  "source_url": "https://www.amuse.co.jp/artist/A9019/index.html",
+  "updated_note_ja": "アミューズ公式プロフィールをもとに整理しています。",
+  "updated_note_ko": "아뮤즈 공식 프로필을 바탕으로 정리했습니다.",
+  "name_ja": "橘 めい",
+  "name_ko": "타치바나 메이",
+  "romanized": "Tachibana May",
+  "affiliation_ja": "アミューズクリエイティブスタジオ所属",
+  "affiliation_ko": "아뮤즈 크리에이티브 스튜디오 소속",
+  "occupation_ja": "声優",
+  "occupation_ko": "성우",
+  "profile_image_candidates": [
+    "assets/profile.jpg",
+    "https://amuse-creative-studio.jp/wp-content/uploads/2024/12/tachibana_may.jpg",
     "https://pbs.twimg.com/profile_images/1906721413953933313/858Cl1ZU.jpg"
   ],
-  "updated_note_ja":"アミューズ公式プロフィールをもとに整理しています。",
-  "updated_note_ko":"아뮤즈 공식 프로필을 바탕으로 정리했습니다.",
-  "name_ja":"橘 めい",
-  "name_ko":"타치바나 메이",
-  "romanized":"Tachibana May",
-  "affiliation_ja":"アミューズクリエイティブスタジオ所属",
-  "affiliation_ko":"아뮤즈 크리에이티브 스튜디오 소속",
-  "occupation_ja":"声優",
-  "occupation_ko":"성우",
-  "fields":[
+  "fields": [
     {"label_ja":"性別","label_ko":"성별","value_ja":"女性","value_ko":"여성"},
     {"label_ja":"生年月日","label_ko":"생년월일","value_ja":"2008年11月19日","value_ko":"2008년 11월 19일"},
+    {"label_ja":"年齢","label_ko":"나이","value_ja":"17歳","value_ko":"17세"},
     {"label_ja":"出身地","label_ko":"출신지","value_ja":"東京都","value_ko":"도쿄도"},
     {"label_ja":"身長","label_ko":"신장","value_ja":"168cm","value_ko":"168cm"},
     {"label_ja":"血液型","label_ko":"혈액형","value_ja":"B","value_ko":"B형"},
     {"label_ja":"特技","label_ko":"특기","value_ja":"ダンス・歌・スポーツ全般","value_ko":"댄스·노래·스포츠 전반"},
     {"label_ja":"趣味","label_ko":"취미","value_ja":"観劇・読書・絵を描くこと","value_ko":"공연 관람·독서·그림 그리기"}
   ],
-  "voice_samples":[
-    {"ja":"ボイスサンプル1","ko":"보이스 샘플 1","duration":"00:23"},
-    {"ja":"ボイスサンプル2","ko":"보이스 샘플 2","duration":"00:31"},
-    {"ja":"ボイスサンプル3","ko":"보이스 샘플 3","duration":"00:41"},
-    {"ja":"ボイスサンプル4","ko":"보이스 샘플 4","duration":"00:35"},
-    {"ja":"ボイスサンプル5","ko":"보이스 샘플 5","duration":"00:30"},
-    {"ja":"ナレーション","ko":"내레이션","duration":"00:31"}
+  "voice_samples": [
+    {"id":"voice_sample_1","ja":"ボイスサンプル1","ko":"보이스 샘플 1","duration":"00:23","src":"audio/voice_sample_1.mp3"},
+    {"id":"voice_sample_2","ja":"ボイスサンプル2","ko":"보이스 샘플 2","duration":"00:31","src":"audio/voice_sample_2.mp3"},
+    {"id":"voice_sample_3","ja":"ボイスサンプル3","ko":"보이스 샘플 3","duration":"00:41","src":"audio/voice_sample_3.mp3"},
+    {"id":"voice_sample_4","ja":"ボイスサンプル4","ko":"보이스 샘플 4","duration":"00:35","src":"audio/voice_sample_4.mp3"},
+    {"id":"voice_sample_5","ja":"ボイスサンプル5","ko":"보이스 샘플 5","duration":"00:30","src":"audio/voice_sample_5.mp3"},
+    {"id":"narration","ja":"ナレーション","ko":"내레이션","duration":"00:31","src":"audio/narration.mp3"}
+  ],
+  "information": [
+    {
+      "type":"Live","subtype":"Event","date":"2026-06-15",
+      "title_ja":"VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ「HELLO WORLD！」　出演決定",
+      "title_ko":"VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 「HELLO WORLD!」 출연 결정",
+      "body_ja":"VIRTUAL GIRL @ WORLD'S END スペシャルトーク＆ミニライブ「HELLO WORLD！」\n開催日：2026年11月1日（日）\n［昼の部］開場：14:00　開演：14:30\n［夜の部］開場：18:00　開演：18:30（予定）\n会場：横浜ReNY beta\n出演者：橘杏咲（アイ役）、立花日菜（リンカ役）、橘めい（マキ役）",
+      "body_ko":"VIRTUAL GIRL @ WORLD'S END 스페셜 토크 & 미니 라이브 「HELLO WORLD!」\n개최일: 2026년 11월 1일(일)\n[낮 공연] 개장 14:00 / 개연 14:30\n[밤 공연] 개장 18:00 / 개연 18:30(예정)\n장소: 요코하마 ReNY beta\n출연: 타치바나 아즈사(아이 역), 타치바나 히나(린카 역), 타치바나 메이(마키 역)",
+      "url":"https://virtualgirl.bushiroad.com/news/post-19/"
+    },
+    {
+      "type":"Media","subtype":"TV/WebTV","date":"2026-03-13",
+      "title_ja":"TOKYO MX　TVアニメ「魔法の姉妹ルルットリリィ」　出演決定",
+      "title_ko":"TOKYO MX TV 애니메이션 「魔法の姉妹ルルットリリィ」 출연 결정",
+      "body_ja":"TOKYO MX　TVアニメ「魔法の姉妹ルルットリリィ」\n2026年4月5日（日）オンエアスタート\n＊毎週日曜日22:30～\n＊主演：野々山 風&こんぺとリリィ 役",
+      "body_ko":"TOKYO MX TV 애니메이션 「魔法の姉妹ルルットリリィ」\n2026년 4월 5일(일) 방송 시작\n* 매주 일요일 22:30~\n* 주연: 野々山 風 & こんぺとリリィ 역",
+      "url":"https://www.luluttolilly.com"
+    },
+    {
+      "type":"Live","subtype":"Event","date":"2026-01-19",
+      "title_ja":"「AnimeJapan 2026」　出演決定",
+      "title_ko":"「AnimeJapan 2026」 출연 결정",
+      "body_ja":"「AnimeJapan 2026」\n■「魔法の姉妹ルルットリリィ」放送直前AJスペシャルステージ\n出演日：2026年3月29日（日）\n時間：15:05〜15:35\n会場：BLUE ステージ",
+      "body_ko":"「AnimeJapan 2026」\n■ 「魔法の姉妹ルルットリリィ」 방송 직전 AJ 스페셜 스테이지\n출연일: 2026년 3월 29일(일)\n시간: 15:05~15:35\n장소: BLUE 스테이지",
+      "url":"https://www.luluttolilly.com/news/detail.php?id=23052"
+    },
+    {
+      "type":"Live","subtype":"Event","date":"2026-01-12",
+      "title_ja":"MyGO!!!!!×Ave Mujica ツーマンライブ「\"moment / memory\"」　オープニングアクト出演決定",
+      "title_ko":"MyGO!!!!!×Ave Mujica 투맨 라이브 「\"moment / memory\"」 오프닝 액트 출연 결정",
+      "body_ja":"MyGO!!!!!×Ave Mujica ツーマンライブ「\"moment / memory\"」\n出演日：2026年3月1日（日）\n開場：15:30　開演：17:00（予定）\n会場：Kアリーナ横浜\n＊オープニングアクトとして出演\n一家Dumb Rock! Gt.＆Vo.須賀蕾叶役",
+      "body_ko":"MyGO!!!!!×Ave Mujica 투맨 라이브 「\"moment / memory\"」\n출연일: 2026년 3월 1일(일)\n개장 15:30 / 개연 17:00(예정)\n장소: K 아레나 요코하마\n* 오프닝 액트로 출연\n一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역",
+      "url":"https://www.amuse.co.jp/artist/A9019/index.html"
+    },
+    {
+      "type":"Other","subtype":"Game","date":"2026-01-12",
+      "title_ja":"ゲーム「BanG Dream! Our Notes」　出演決定",
+      "title_ko":"게임 「BanG Dream! Our Notes」 출연 결정",
+      "body_ja":"次世代ガールズバンドプロジェクトBanG Dream!（バンドリ！）の新作モバイルゲーム「BanG Dream! Our Notes」への出演決定\n＊一家Dumb Rock! Gt.＆Vo.須賀蕾叶役",
+      "body_ko":"차세대 걸즈 밴드 프로젝트 BanG Dream!(뱅드림!)의 신작 모바일 게임 「BanG Dream! Our Notes」 출연 결정\n* 一家Dumb Rock! Gt.&Vo. 須賀蕾叶 역",
+      "url":"https://www.amuse.co.jp/artist/A9019/index.html"
+    }
+  ],
+  "related_topics": [
+    {
+      "date":"2026-06-15",
+      "title_ja":"「アミューズクリエイティブスタジオ」「賢プロダクション」「キングレコード」3社による《2026声優アーティスト育成プログラム・セレクション》開催決定！",
+      "title_ko":"아뮤즈 크리에이티브 스튜디오·켄 프로덕션·킹 레코드 3사가 진행하는 《2026 성우 아티스트 육성 프로그램 셀렉션》 개최 결정!",
+      "url":"https://www.amuse.co.jp/topics/2026/06/_32026.html"
+    }
   ]
 }
