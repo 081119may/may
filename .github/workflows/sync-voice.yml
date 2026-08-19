@@ -1,0 +1,72 @@
+name: Sync official voice samples
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/sync-voice.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch official Amuse voice files
+        run: |
+          python - <<'PY'
+          import html, pathlib, re, urllib.parse, urllib.request
+          base='https://www.amuse.co.jp/artist/A9019/'
+          headers={'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/131 Safari/537.36'}
+          def fetch(url):
+              req=urllib.request.Request(url,headers=headers)
+              with urllib.request.urlopen(req,timeout=30) as r:
+                  return r.read(), r.headers.get_content_type()
+          raw,_=fetch(base)
+          text=raw.decode('utf-8','ignore')
+          pathlib.Path('voice_debug.html').write_text(text)
+          candidates=[]
+          def add(u):
+              u=html.unescape(u).replace('\\/','/')
+              u=urllib.parse.urljoin(base,u)
+              if u not in candidates: candidates.append(u)
+          for pat in [r'''(?:src|href|data-src|data-file|data-audio)\s*=\s*["']([^"']+\.(?:mp3|m4a|ogg|wav)(?:\?[^"']*)?)["']''',r'''(https?://[^"'<> ]+\.(?:mp3|m4a|ogg|wav)(?:\?[^"'<> ]*)?)''']:
+              for m in re.finditer(pat,text,re.I): add(m.group(1))
+          scripts=[]
+          for m in re.finditer(r'''<script[^>]+src=["']([^"']+)["']''',text,re.I):
+              scripts.append(urllib.parse.urljoin(base,html.unescape(m.group(1))))
+          for s in scripts:
+              try:
+                  b,_=fetch(s); t=b.decode('utf-8','ignore')
+                  for m in re.finditer(r'''(["'])([^"']+\.(?:mp3|m4a|ogg|wav)(?:\?[^"']*)?)\1''',t,re.I): add(m.group(2))
+                  for m in re.finditer(r'''(https?://[^"'<> ]+\.(?:mp3|m4a|ogg|wav)(?:\?[^"'<> ]*)?)''',t,re.I): add(m.group(1))
+              except Exception as e: print('script warn',s,e)
+          print('AUDIO_CANDIDATES',len(candidates))
+          for u in candidates: print(u)
+          if len(candidates)<6:
+              raise SystemExit('Could not discover six official voice files')
+          out=pathlib.Path('audio'); out.mkdir(exist_ok=True)
+          names=['voice_sample_1','voice_sample_2','voice_sample_3','voice_sample_4','voice_sample_5','narration']
+          saved=[]
+          for name,u in zip(names,candidates[:6]):
+              data,ctype=fetch(u)
+              ext='.mp3' if ('mpeg' in ctype or '.mp3' in u.lower()) else ('.m4a' if '.m4a' in u.lower() else '.ogg')
+              p=out/(name+ext); p.write_bytes(data)
+              if p.stat().st_size<10000: raise SystemExit(f'bad audio {u} {p.stat().st_size}')
+              saved.append((name,str(p),p.stat().st_size))
+          pathlib.Path('data/voice-map.json').write_text(__import__('json').dumps({k:v for k,v,_ in saved},ensure_ascii=False,separators=(',',':')))
+          print(saved)
+          PY
+      - name: Commit voice files
+        run: |
+          rm -f voice_debug.html
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add audio data/voice-map.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Sync official voice samples [skip ci]'
+          git push
