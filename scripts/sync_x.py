@@ -7,12 +7,29 @@ DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
 OPENAI_KEY=os.getenv('OPENAI_API_KEY','').strip()
 MODEL=os.getenv('OPENAI_TRANSLATE_MODEL','gpt-5-mini')
-UA='Mozilla/5.0 MayArchiveBot/4.1'
+UA='Mozilla/5.0 MayArchiveBot/4.2'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
     try:return json.loads(path.read_text('utf-8'))
     except Exception:return default
+
+GLOSSARY=(read_json(DATA/'translation-glossary.json',{}) or {}).get('terms') or []
+GLOSSARY=sorted(GLOSSARY,key=lambda x:max([len(s) for s in x.get('ja',[])]+[0]),reverse=True)
+
+def apply_glossary(ja,ko):
+    ja=ja or '';ko=ko or ''
+    for term in GLOSSARY:
+        srcs=term.get('ja') or []
+        if not any(s and s in ja for s in srcs):continue
+        target=term.get('ko') or ''
+        aliases=sorted(set(term.get('aliases') or []),key=len,reverse=True)
+        for alias in aliases:
+            if alias and alias!=target:ko=ko.replace(alias,target)
+        # If a translator left the Japanese term untouched, normalize that too.
+        for src in sorted(srcs,key=len,reverse=True):
+            if src and src!=target:ko=ko.replace(src,target)
+    return ko
 
 def get_json(url,timeout=45):
     req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
@@ -26,15 +43,18 @@ def get_json(url,timeout=45):
 
 def openai_translate(text):
     if not OPENAI_KEY or not text:return ''
-    body=json.dumps({'model':MODEL,'store':False,'input':[{'role':'developer','content':'일본어 X 게시물을 자연스러운 한국어로 번역하세요. 해시태그, 고유명사, 이모지, 줄바꿈을 최대한 보존하고 설명 없이 번역문만 출력하세요.'},{'role':'user','content':text}]},ensure_ascii=False).encode()
+    glossary='\n'.join(f"{(x.get('ja') or [''])[0]} => {x.get('ko','')}" for x in GLOSSARY)
+    instruction='일본어 X 게시물을 자연스러운 한국어로 번역하세요. 해시태그, 이모지, 줄바꿈을 최대한 보존하고 설명 없이 번역문만 출력하세요. 다음 고유명사 표기는 반드시 그대로 사용하세요:\n'+glossary
+    body=json.dumps({'model':MODEL,'store':False,'input':[{'role':'developer','content':instruction},{'role':'user','content':text}]},ensure_ascii=False).encode()
     req=urllib.request.Request('https://api.openai.com/v1/responses',data=body,headers={'Authorization':f'Bearer {OPENAI_KEY}','Content-Type':'application/json','User-Agent':UA},method='POST')
     with urllib.request.urlopen(req,timeout=90) as r:data=json.load(r)
     return '\n'.join(c.get('text','') for item in data.get('output',[]) for c in item.get('content',[]) if c.get('type') in ('output_text','text')).strip()
 
 def translated_text(x):
-    tr=x.get('translation') or {}
-    if isinstance(tr,dict) and tr.get('text'):return tr['text'].strip()
-    return openai_translate((x.get('text') or '').strip())
+    ja=(x.get('text') or '').strip();tr=x.get('translation') or {}
+    if isinstance(tr,dict) and tr.get('text'):ko=tr['text'].strip()
+    else:ko=openai_translate(ja)
+    return apply_glossary(ja,ko)
 
 def load_archive():
     m=read_json(DATA/'manifest.json',{}) or {};parts=m.get('archive_parts') or []
@@ -124,6 +144,13 @@ def backfill_recent_translations(posts):
         if not cursor:break
     return changed
 
+def normalize_existing(posts):
+    changed=0
+    for p in posts:
+        old=p.get('ko') or '';new=apply_glossary(p.get('ja') or '',old)
+        if new!=old:p['ko']=new;changed+=1
+    return changed
+
 def convert(x):
     tid=str(x['id']);d=parse_time(x.get('created_at') or x.get('created_timestamp'));paths=[]
     mo=x.get('media') or {};media=(mo.get('all') or ((mo.get('photos') or [])+(mo.get('videos') or []))) if isinstance(mo,dict) else (mo if isinstance(mo,list) else [])
@@ -138,10 +165,10 @@ def convert(x):
     return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':author.get('name') or '橘めい','handle':author.get('screen_name') or USERNAME,'ja':text,'ko':translated_text(x),'reply':x.get('replies',0) or 0,'retweet':x.get('reposts',0) or 0,'favorite':x.get('likes',0) or 0,'views':x.get('views',0) or 0,'has_media':bool(paths),'media':paths}
 
 def main():
-    m,posts=load_archive();new=fetch_new(posts)
-    print('archive',len(posts),'new X posts',len(new),'since',int(latest_epoch(posts)))
+    m,posts=load_archive();normalized=normalize_existing(posts);new=fetch_new(posts)
+    print('archive',len(posts),'glossary fixes',normalized,'new X posts',len(new),'since',int(latest_epoch(posts)))
     if new:posts.extend(convert(x) for x in reversed(new))
     filled=backfill_recent_translations(posts);print('translations backfilled',filled)
-    if new or filled:save_archive(m,posts)
+    if new or filled or normalized:save_archive(m,posts)
 
 if __name__=='__main__':main()
