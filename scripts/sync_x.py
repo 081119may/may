@@ -7,7 +7,7 @@ DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
 OPENAI_KEY=os.getenv('OPENAI_API_KEY','').strip()
 MODEL=os.getenv('OPENAI_TRANSLATE_MODEL','gpt-5-mini')
-UA='Mozilla/5.0 MayArchiveBot/4.2'
+UA='Mozilla/5.0 MayArchiveBot/4.3'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
@@ -26,7 +26,6 @@ def apply_glossary(ja,ko):
         aliases=sorted(set(term.get('aliases') or []),key=len,reverse=True)
         for alias in aliases:
             if alias and alias!=target:ko=ko.replace(alias,target)
-        # If a translator left the Japanese term untouched, normalize that too.
         for src in sorted(srcs,key=len,reverse=True):
             if src and src!=target:ko=ko.replace(src,target)
     return ko
@@ -47,13 +46,29 @@ def openai_translate(text):
     instruction='일본어 X 게시물을 자연스러운 한국어로 번역하세요. 해시태그, 이모지, 줄바꿈을 최대한 보존하고 설명 없이 번역문만 출력하세요. 다음 고유명사 표기는 반드시 그대로 사용하세요:\n'+glossary
     body=json.dumps({'model':MODEL,'store':False,'input':[{'role':'developer','content':instruction},{'role':'user','content':text}]},ensure_ascii=False).encode()
     req=urllib.request.Request('https://api.openai.com/v1/responses',data=body,headers={'Authorization':f'Bearer {OPENAI_KEY}','Content-Type':'application/json','User-Agent':UA},method='POST')
-    with urllib.request.urlopen(req,timeout=90) as r:data=json.load(r)
-    return '\n'.join(c.get('text','') for item in data.get('output',[]) for c in item.get('content',[]) if c.get('type') in ('output_text','text')).strip()
+    try:
+        with urllib.request.urlopen(req,timeout=90) as r:data=json.load(r)
+        return '\n'.join(c.get('text','') for item in data.get('output',[]) for c in item.get('content',[]) if c.get('type') in ('output_text','text')).strip()
+    except Exception as e:
+        print('openai translation WARN',repr(e));return ''
+
+def google_translate(text):
+    """Best-effort no-key fallback used only when FxTwitter/OpenAI provide no translation."""
+    if not text:return ''
+    try:
+        q=urllib.parse.urlencode({'client':'gtx','sl':'ja','tl':'ko','dt':'t','q':text})
+        req=urllib.request.Request('https://translate.googleapis.com/translate_a/single?'+q,headers={'User-Agent':UA,'Accept':'application/json'})
+        with urllib.request.urlopen(req,timeout=45) as r:data=json.load(r)
+        if not isinstance(data,list) or not data:return ''
+        return ''.join(seg[0] for seg in (data[0] or []) if isinstance(seg,list) and seg and isinstance(seg[0],str)).strip()
+    except Exception as e:
+        print('google translation WARN',repr(e));return ''
 
 def translated_text(x):
     ja=(x.get('text') or '').strip();tr=x.get('translation') or {}
-    if isinstance(tr,dict) and tr.get('text'):ko=tr['text'].strip()
-    else:ko=openai_translate(ja)
+    ko=(tr.get('text') or '').strip() if isinstance(tr,dict) else ''
+    if not ko:ko=openai_translate(ja)
+    if not ko:ko=google_translate(ja)
     return apply_glossary(ja,ko)
 
 def load_archive():
@@ -142,6 +157,11 @@ def backfill_recent_translations(posts):
         if not missing:break
         cursor=(data.get('cursor') or {}).get('bottom')
         if not cursor:break
+    # If the public timeline omitted a missing archived post, translate its stored Japanese text directly.
+    for tid,p in list(missing.items()):
+        ko=apply_glossary(p.get('ja') or '',openai_translate(p.get('ja') or '') or google_translate(p.get('ja') or ''))
+        if ko:p['ko']=ko;changed+=1;missing.pop(tid,None)
+        time.sleep(.15)
     return changed
 
 def normalize_existing(posts):
