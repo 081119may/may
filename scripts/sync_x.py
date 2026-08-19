@@ -8,7 +8,7 @@ USERNAME=os.getenv('X_USERNAME','May_o_o_T')
 TOKEN=os.getenv('X_BEARER_TOKEN','').strip()
 OPENAI_KEY=os.getenv('OPENAI_API_KEY','').strip()
 TRANSLATE_MODEL=os.getenv('OPENAI_TRANSLATE_MODEL','gpt-5-mini')
-UA='Mozilla/5.0 MayArchiveBot/2.0'
+UA='Mozilla/5.0 MayArchiveBot/3.0'
 
 def read_json(path,default=None):
     try:return json.loads(path.read_text('utf-8'))
@@ -52,15 +52,16 @@ def save_archive(manifest,posts):
     (DATA/'manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n','utf-8')
     (DATA/'tweet_ids.txt').write_text('\n'.join(str(p['id']) for p in posts if p.get('id'))+'\n','utf-8')
 
-def best_media(m):
-    typ=m.get('type','')
+def best_fx_media(m):
+    typ=(m.get('type') or '').lower()
     if typ=='photo' and m.get('url'):return m['url'],'jpg'
-    variants=[v for v in m.get('variants',[]) if str(v.get('content_type','')).startswith('video/mp4') and v.get('url')]
-    if variants:
-        variants.sort(key=lambda v:v.get('bit_rate') or 0,reverse=True)
-        return variants[0]['url'],'mp4'
-    if m.get('preview_image_url'):return m['preview_image_url'],'jpg'
-    return None,None
+    formats=[f for f in (m.get('formats') or []) if f.get('url') and (f.get('container')=='mp4' or '.mp4' in f.get('url','').split('?')[0].lower())]
+    if formats:
+        formats.sort(key=lambda f:f.get('bitrate') or f.get('size') or 0,reverse=True)
+        return formats[0]['url'],'mp4'
+    u=m.get('transcode_url') or m.get('url') or m.get('thumbnail_url')
+    if not u:return None,None
+    return u,('mp4' if typ in ('video','gif') and '.mp4' in u.lower() else 'jpg')
 
 def download(url,path):
     if path.exists() and path.stat().st_size>1000:return True
@@ -72,39 +73,103 @@ def download(url,path):
     if len(data)>90*1024*1024:return False
     path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data);return True
 
-def main():
-    manifest,posts=load_archive();known={str(p.get('id')) for p in posts}
-    if not TOKEN:
-        print('X_BEARER_TOKEN is not configured; keeping existing archive unchanged.')
-        return
+def normalize_fx_post(x):
+    tid=str(x.get('id') or '')
+    created=x.get('created_at') or x.get('date') or ''
+    if isinstance(created,(int,float)):
+        d=dt.datetime.fromtimestamp(created,dt.timezone.utc).astimezone(ZoneInfo('Asia/Tokyo'))
+    else:
+        try:d=dt.datetime.fromisoformat(str(created).replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
+        except Exception:d=dt.datetime.now(ZoneInfo('Asia/Tokyo'))
+    text=(x.get('text') or x.get('content') or '').strip()
+    m=x.get('metrics') or {}
+    media=((x.get('media') or {}).get('all') or x.get('media') or [])
+    if isinstance(media,dict):media=media.get('all') or []
+    paths=[]
+    for i,item in enumerate(media,1):
+        u,ext=best_fx_media(item or {})
+        if not u:continue
+        rel=f'media_remote/{tid}_{i}.{ext}'
+        try:
+            if download(u,ROOT/rel):paths.append(rel)
+        except Exception as e:print('media WARN',tid,repr(e))
+    return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':'橘めい','handle':USERNAME,'ja':text,'ko':translate_ko(text) if OPENAI_KEY else '','reply':m.get('replies',m.get('reply_count',0)),'retweet':m.get('retweets',m.get('retweet_count',0)),'favorite':m.get('likes',m.get('like_count',0)),'views':m.get('views',m.get('impression_count',0)),'has_media':bool(paths),'media':paths}
+
+def fetch_public_timeline():
+    urls=[
+        f'https://api.fxtwitter.com/2/profile/{urllib.parse.quote(USERNAME)}/statuses',
+        f'https://api.fxtwitter.com/{urllib.parse.quote(USERNAME)}'
+    ]
+    last=None
+    for u in urls:
+        try:
+            data=api_json(u)
+            candidates=[]
+            if isinstance(data,list):candidates=data
+            elif isinstance(data,dict):
+                for key in ('tweets','statuses','posts','data'):
+                    v=data.get(key)
+                    if isinstance(v,list):candidates=v;break
+                if not candidates and isinstance(data.get('timeline'),list):candidates=data['timeline']
+            if candidates:return candidates
+        except Exception as e:last=e;print('timeline WARN',u,repr(e))
+    if last:raise last
+    return []
+
+def fetch_official_api():
     auth={'Authorization':f'Bearer {TOKEN}'}
     user=api_json(f'https://api.x.com/2/users/by/username/{urllib.parse.quote(USERNAME)}',auth).get('data') or {}
     uid=user.get('id')
-    if not uid:raise SystemExit('Could not resolve X user id')
+    if not uid:raise RuntimeError('Could not resolve X user id')
     found=[];token=None;media_by_key={}
     for _ in range(10):
         q={'max_results':'100','exclude':'retweets','tweet.fields':'created_at,public_metrics,attachments,note_tweet','expansions':'attachments.media_keys','media.fields':'type,url,preview_image_url,variants,width,height'}
         if token:q['pagination_token']=token
         payload=api_json(f'https://api.x.com/2/users/{uid}/tweets?'+urllib.parse.urlencode(q),auth)
         for m in (payload.get('includes') or {}).get('media',[]):media_by_key[m.get('media_key')]=m
-        page_posts=payload.get('data') or [];found.extend(page_posts)
-        if any(str(x.get('id')) in known for x in page_posts):break
+        for x in payload.get('data') or []:
+            x['_media_by_key']=media_by_key
+            found.append(x)
         token=(payload.get('meta') or {}).get('next_token')
         if not token:break
         time.sleep(.3)
-    new=[x for x in found if str(x.get('id')) not in known]
+    return found
+
+def normalize_official(x):
+    tid=str(x['id']);text=((x.get('note_tweet') or {}).get('text') or x.get('text') or '').strip()
+    created=x.get('created_at') or dt.datetime.now(dt.timezone.utc).isoformat()
+    d=dt.datetime.fromisoformat(created.replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
+    metrics=x.get('public_metrics') or {};paths=[];media_by_key=x.get('_media_by_key') or {}
+    for i,key in enumerate((x.get('attachments') or {}).get('media_keys') or [],1):
+        m=media_by_key.get(key) or {};typ=m.get('type','')
+        if typ=='photo':u,ext=m.get('url'),'jpg'
+        else:
+            variants=[v for v in m.get('variants',[]) if str(v.get('content_type','')).startswith('video/mp4') and v.get('url')]
+            variants.sort(key=lambda v:v.get('bit_rate') or 0,reverse=True)
+            u,ext=(variants[0]['url'],'mp4') if variants else (m.get('preview_image_url'),'jpg')
+        if not u:continue
+        rel=f'media_remote/{tid}_{i}.{ext}'
+        if download(u,ROOT/rel):paths.append(rel)
+    return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':'橘めい','handle':USERNAME,'ja':text,'ko':translate_ko(text) if OPENAI_KEY else '','reply':metrics.get('reply_count',0),'retweet':metrics.get('retweet_count',0),'favorite':metrics.get('like_count',0),'views':metrics.get('impression_count',0),'has_media':bool(paths),'media':paths}
+
+def main():
+    manifest,posts=load_archive();known={str(p.get('id')) for p in posts}
+    raw=[];normalizer=normalize_fx_post
+    try:
+        raw=fetch_public_timeline()
+    except Exception as e:
+        print('public timeline failed',repr(e))
+        if TOKEN:
+            raw=fetch_official_api();normalizer=normalize_official
+        else:
+            raise SystemExit('Public timeline failed and no X_BEARER_TOKEN fallback is configured')
+    new=[]
+    for x in raw:
+        tid=str(x.get('id') or '')
+        if tid and tid not in known:new.append(x)
     print('new X posts',len(new))
-    for x in reversed(new):
-        tid=str(x['id']);text=((x.get('note_tweet') or {}).get('text') or x.get('text') or '').strip()
-        created=x.get('created_at') or dt.datetime.now(dt.timezone.utc).isoformat()
-        d=dt.datetime.fromisoformat(created.replace('Z','+00:00')).astimezone(ZoneInfo('Asia/Tokyo'))
-        metrics=x.get('public_metrics') or {};paths=[]
-        for i,key in enumerate((x.get('attachments') or {}).get('media_keys') or [],1):
-            u,ext=best_media(media_by_key.get(key) or {})
-            if not u:continue
-            rel=f'media_remote/{tid}_{i}.{ext}'
-            if download(u,ROOT/rel):paths.append(rel)
-        posts.append({'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':'橘めい','handle':USERNAME,'ja':text,'ko':translate_ko(text) if OPENAI_KEY else '','reply':metrics.get('reply_count',0),'retweet':metrics.get('retweet_count',0),'favorite':metrics.get('like_count',0),'views':metrics.get('impression_count',0),'has_media':bool(paths),'media':paths})
-    if new:save_archive(manifest,posts)
+    if not new:return
+    converted=[normalizer(x) for x in reversed(new)]
+    posts.extend(converted);save_archive(manifest,posts)
 
 if __name__=='__main__':main()
