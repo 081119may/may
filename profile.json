@@ -1,0 +1,23 @@
+{
+  "source_url": "https://www.amuse.co.jp/artist/A9019/index.html",
+  "updated_note_ja": "アミューズ公式プロフィールをもとに整理したページです。",
+  "updated_note_ko": "아뮤즈 공식 프로필을 바탕으로 정리한 페이지입니다.",
+  "name_ja": "橘 めい",
+  "name_ko": "타치바나 메이",
+  "romanized": "Tachibana May",
+  "affiliation_ja": "アミューズクリエイティブスタジオ所属",
+  "affiliation_ko": "아뮤즈 크리에이티브 스튜디오 소속",
+  "occupation_ja": "声優",
+  "occupation_ko": "성우",
+  "fields": [
+    {"label_ja":"性別","label_ko":"성별","value_ja":"女性","value_ko":"여성"},
+    {"label_ja":"生年月日","label_ko":"생년월일","value_ja":"2008年11月19日","value_ko":"2008년 11월 19일"},
+    {"label_ja":"出身地","label_ko":"출신지","value_ja":"東京都","value_ko":"도쿄도"},
+    {"label_ja":"身長","label_ko":"신장","value_ja":"168cm","value_ko":"168cm"},
+    {"label_ja":"血液型","label_ko":"혈액형","value_ja":"B","value_ko":"B형"},
+    {"label_ja":"特技","label_ko":"특기","value_ja":"ダンス・歌・スポーツ全般","value_ko":"댄스·노래·스포츠 전반"},
+    {"label_ja":"趣味","label_ko":"취미","value_ja":"観劇・読書・絵を描くこと","value_ko":"공연 관람·독서·그림 그리기"}
+  ],
+  "voice_samples_ja": ["ボイスサンプル1","ボイスサンプル2","ボイスサンプル3","ボイスサンプル4","ボイスサンプル5","ナレーション"],
+  "voice_samples_ko": ["보이스 샘플 1","보이스 샘플 2","보이스 샘플 3","보이스 샘플 4","보이스 샘플 5","내레이션"]
+}
