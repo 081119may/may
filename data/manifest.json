@@ -1,9 +1,10 @@
 {
-  "tweet_files": ["data/tweets-preview.json"],
-  "ko_files": ["data/ko-preview.json"],
-  "tweet_count": 10,
-  "translation_count": 10,
+  "format": "gzip-base64",
+  "archive_file": "data/archive-full.b64",
+  "tweet_count": 455,
+  "translation_count": 455,
   "full_archive_count": 455,
+  "media_count": 269,
   "media_base": "media/",
-  "status": "preview"
+  "status": "full"
 }
