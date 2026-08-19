@@ -2,7 +2,8 @@
   "format": "gzip-base64-parts",
   "archive_parts": [
     "data/archive_part_00_0.txt",
-    "data/archive_part_00_1.txt",
+    "data/archive_part_00_1_0.txt",
+    "data/archive_part_00_1_1.txt",
     "data/archive_part_00_2.txt",
     "data/archive_part_00_3.txt",
     "data/archive_part_00_4.txt",
