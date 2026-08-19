@@ -27,25 +27,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download missing media
+      - name: Download media timeline
         env:
           X_USERNAME: May_o_o_T
         run: |
           python - <<'PY'
-          import json, os, pathlib, time, urllib.request
+          import json, os, pathlib, time, urllib.parse, urllib.request
           root=pathlib.Path('.')
           out=root/'media_remote';out.mkdir(exist_ok=True)
           username=os.getenv('X_USERNAME','May_o_o_T')
-          ids=[x.strip() for x in (root/'data/tweet_ids.txt').read_text().splitlines() if x.strip()]
-          map_path=root/'data/media-map.json';checked_path=root/'data/media-checked.json'
+          wanted=set(x.strip() for x in (root/'data/tweet_ids.txt').read_text().splitlines() if x.strip())
+          map_path=root/'data/media-map.json'
           try: media_map=json.loads(map_path.read_text())
           except Exception: media_map={}
-          try: checked=set(json.loads(checked_path.read_text()))
-          except Exception: checked=set()
-          headers={'User-Agent':'Mozilla/5.0 MayArchive/3.0','Accept':'application/json'}
+          headers={'User-Agent':'Mozilla/5.0 MayArchive/3.1','Accept':'application/json'}
           def get_json(url):
               req=urllib.request.Request(url,headers=headers)
-              with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
+              with urllib.request.urlopen(req,timeout=45) as r:return json.load(r)
           def download(url,path):
               if path.exists() and path.stat().st_size>1000:return True
               req=urllib.request.Request(url,headers=headers)
@@ -57,7 +55,7 @@ jobs:
               return path.exists() and path.stat().st_size>1000
           def media_url(m):
               typ=(m.get('type') or '').lower()
-              if typ=='photo': return m.get('url'),'.jpg'
+              if typ=='photo' and m.get('url'):return m['url'],'.jpg'
               formats=[f for f in (m.get('formats') or []) if f.get('url') and (f.get('container')=='mp4' or '.mp4' in f.get('url','').split('?')[0].lower())]
               if formats:
                   formats.sort(key=lambda f:f.get('bitrate') or f.get('size') or 0,reverse=True)
@@ -65,35 +63,40 @@ jobs:
               u=m.get('transcode_url') or m.get('url') or m.get('thumbnail_url')
               if not u:return None,None
               return u,('.mp4' if typ in ('video','gif') and '.mp4' in u.lower() else '.jpg')
-          targets=[tid for tid in ids if tid not in checked]
-          print('unchecked posts',len(targets),'of',len(ids))
-          for n,tid in enumerate(targets,1):
-              ok=False
-              try:
-                  # Legacy status endpoint requires the username in the URL.
-                  data=get_json(f'https://api.fxtwitter.com/{username}/status/{tid}')
-                  tweet=data.get('tweet') or {}
-                  allm=((tweet.get('media') or {}).get('all') or [])
+          cursor=None;pages=0;seen_posts=0
+          while pages<30:
+              q={'count':'100'}
+              if cursor:q['cursor']=cursor
+              data=get_json(f'https://api.fxtwitter.com/2/profile/{urllib.parse.quote(username)}/media?'+urllib.parse.urlencode(q))
+              results=data.get('results') or []
+              if not results:break
+              pages+=1
+              for post in results:
+                  tid=str(post.get('id') or '')
+                  if not tid or tid not in wanted:continue
+                  seen_posts+=1
+                  mo=post.get('media') or {}
+                  media=[]
+                  if isinstance(mo,dict):media=(mo.get('photos') or [])+(mo.get('videos') or [])
+                  elif isinstance(mo,list):media=mo
                   paths=[]
-                  for i,m in enumerate(allm,1):
-                      url,ext=media_url(m)
+                  for i,m in enumerate(media,1):
+                      url,ext=media_url(m or {})
                       if not url:continue
-                      rel=f'media_remote/{tid}_{i}{ext}';p=root/rel
-                      if download(url,p):paths.append(rel)
+                      rel=f'media_remote/{tid}_{i}{ext}'
+                      if download(url,root/rel):paths.append(rel)
                   if paths:media_map[tid]=paths
-                  ok=True
-              except Exception as e:print('WARN',tid,repr(e))
-              if ok:checked.add(tid)
-              if n%20==0:time.sleep(1)
+              cursor=((data.get('cursor') or {}).get('bottom'))
+              if not cursor:break
+              time.sleep(.25)
           map_path.write_text(json.dumps(media_map,ensure_ascii=False,separators=(',',':')))
-          checked_path.write_text(json.dumps(sorted(checked),ensure_ascii=False,separators=(',',':')))
-          print('posts with media',len(media_map),'files',sum(map(len,media_map.values())),'checked',len(checked))
+          print('pages',pages,'matching posts',seen_posts,'posts with media',len(media_map),'files',sum(map(len,media_map.values())))
           PY
       - name: Commit media
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add media_remote data/media-map.json data/media-checked.json
+          git add media_remote data/media-map.json
           if git diff --cached --quiet; then exit 0; fi
           git commit -m 'Sync X media assets'
           git push
