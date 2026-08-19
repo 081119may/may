@@ -21,15 +21,17 @@ jobs:
   sync:
     if: ${{ !contains(github.event.head_commit.message || '', 'Sync profile and upcoming events') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install parser
-        run: pip install beautifulsoup4
-      - name: Refresh Amuse profile and Eventernote-backed schedule
+      - name: Install parser and browser
+        run: |
+          pip install beautifulsoup4 playwright
+          python -m playwright install --with-deps chromium
+      - name: Refresh expanded Amuse profile and Eventernote-backed schedule
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_TRANSLATE_MODEL: gpt-5-mini
