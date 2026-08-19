@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/sync_x.py'
+      - 'data/translation-glossary.json'
       - '.github/workflows/sync-x.yml'
   schedule:
     - cron: '23 */6 * * *'
