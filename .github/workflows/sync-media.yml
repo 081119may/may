@@ -8,77 +8,83 @@ on:
       - '.github/workflows/sync-media.yml'
   workflow_dispatch:
   schedule:
-    - cron: '17 3 * * 1'
+    - cron: '17 3 * * *'
 
 permissions:
   contents: write
+
+concurrency:
+  group: may-media-sync
+  cancel-in-progress: false
 
 jobs:
   sync:
     if: ${{ !contains(github.event.head_commit.message || '', 'Sync X media assets') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Download media
+      - name: Download missing media
         run: |
           python - <<'PY'
-          import json, os, pathlib, time, urllib.request, urllib.error
-          root = pathlib.Path('.')
-          out = root / 'media_remote'
-          out.mkdir(exist_ok=True)
-          ids = [x.strip() for x in (root/'data/tweet_ids.txt').read_text().splitlines() if x.strip()]
-          media_map = {}
-          headers = {'User-Agent':'Mozilla/5.0 MayArchive/1.0'}
+          import json, pathlib, time, urllib.request
+          root=pathlib.Path('.')
+          out=root/'media_remote';out.mkdir(exist_ok=True)
+          ids=[x.strip() for x in (root/'data/tweet_ids.txt').read_text().splitlines() if x.strip()]
+          map_path=root/'data/media-map.json';checked_path=root/'data/media-checked.json'
+          try: media_map=json.loads(map_path.read_text())
+          except Exception: media_map={}
+          try: checked=set(json.loads(checked_path.read_text()))
+          except Exception: checked=set()
+          headers={'User-Agent':'Mozilla/5.0 MayArchive/2.0'}
           def get_json(url):
               req=urllib.request.Request(url,headers=headers)
-              with urllib.request.urlopen(req,timeout=25) as r:
-                  return json.load(r)
+              with urllib.request.urlopen(req,timeout=30) as r:return json.load(r)
           def download(url,path):
+              if path.exists() and path.stat().st_size>1000:return
               req=urllib.request.Request(url,headers=headers)
-              with urllib.request.urlopen(req,timeout=60) as r, open(path,'wb') as f:
+              with urllib.request.urlopen(req,timeout=90) as r,open(path,'wb') as f:
                   while True:
                       b=r.read(1024*1024)
-                      if not b: break
+                      if not b:break
                       f.write(b)
-          for n,tid in enumerate(ids,1):
+          targets=[tid for tid in ids if tid not in checked]
+          print('unchecked posts',len(targets),'of',len(ids))
+          for n,tid in enumerate(targets,1):
+              ok=False
               try:
                   data=get_json(f'https://api.fxtwitter.com/status/{tid}')
                   tweet=data.get('tweet') or {}
                   allm=((tweet.get('media') or {}).get('all') or [])
                   paths=[]
                   for i,m in enumerate(allm,1):
-                      typ=(m.get('type') or '').lower()
-                      url=m.get('url') or m.get('thumbnail_url')
+                      typ=(m.get('type') or '').lower();url=m.get('url') or m.get('thumbnail_url')
                       if typ in ('video','gif'):
                           variants=m.get('variants') or []
                           mp4=[v for v in variants if (v.get('content_type') or '').startswith('video/mp4') and v.get('url')]
-                          if mp4:
-                              mp4.sort(key=lambda v:v.get('bitrate') or 0, reverse=True)
-                              url=mp4[0]['url']
-                      if not url: continue
+                          if mp4:mp4.sort(key=lambda v:v.get('bitrate') or 0,reverse=True);url=mp4[0]['url']
+                      if not url:continue
                       ext='.mp4' if typ in ('video','gif') or '.mp4' in url.split('?')[0].lower() else '.jpg'
-                      rel=f'media_remote/{tid}_{i}{ext}'
-                      p=root/rel
-                      if not p.exists() or p.stat().st_size < 1000:
-                          download(url,p)
-                      if p.exists() and p.stat().st_size:
-                          paths.append(rel)
-                  if paths: media_map[tid]=paths
-              except Exception as e:
-                  print('WARN',tid,repr(e))
-              if n % 20 == 0: time.sleep(1)
-          (root/'data/media-map.json').write_text(json.dumps(media_map,ensure_ascii=False,separators=(',',':')))
-          print('posts with media',len(media_map),'files',sum(map(len,media_map.values())))
+                      rel=f'media_remote/{tid}_{i}{ext}';p=root/rel
+                      download(url,p)
+                      if p.exists() and p.stat().st_size:paths.append(rel)
+                  if paths:media_map[tid]=paths
+                  ok=True
+              except Exception as e:print('WARN',tid,repr(e))
+              if ok:checked.add(tid)
+              if n%20==0:time.sleep(1)
+          map_path.write_text(json.dumps(media_map,ensure_ascii=False,separators=(',',':')))
+          checked_path.write_text(json.dumps(sorted(checked),ensure_ascii=False,separators=(',',':')))
+          print('posts with media',len(media_map),'files',sum(map(len,media_map.values())),'checked',len(checked))
           PY
       - name: Commit media
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add media_remote data/media-map.json
+          git add media_remote data/media-map.json data/media-checked.json
           if git diff --cached --quiet; then exit 0; fi
-          git commit -m 'Sync X media assets [skip ci]'
+          git commit -m 'Sync X media assets'
           git push
