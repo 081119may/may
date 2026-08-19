@@ -1,29 +1,13 @@
 {
   "format": "gzip-base64-parts",
   "archive_parts": [
-    "data/archive_part_00_0.txt",
-    "data/archive_part_00_1_0.txt",
-    "data/archive_part_00_1_1.txt",
-    "data/archive_part_00_2.txt",
-    "data/archive_part_00_3.txt",
-    "data/archive_part_00_4.txt",
-    "data/archive_part_01.txt",
-    "data/archive_part_02.txt",
-    "data/archive_part_03.txt",
-    "data/archive_part_04.txt",
-    "data/archive_part_05.txt",
-    "data/archive_part_06.txt",
-    "data/archive_part_07_0.txt",
-    "data/archive_part_07_1.txt",
-    "data/archive_part_07_2.txt",
-    "data/archive_part_07_3.txt",
-    "data/archive_part_07_4.txt",
-    "data/archive_part_08.txt"
+    "data/archive-auto.b64"
   ],
-  "tweet_count": 455,
-  "translation_count": 455,
-  "full_archive_count": 455,
-  "media_count": 269,
-  "media_base": "media/",
-  "status": "full"
+  "tweet_count": 468,
+  "translation_count": 454,
+  "full_archive_count": 468,
+  "media_count": 276,
+  "media_base": "media_remote/",
+  "status": "auto",
+  "updated_at": "2026-08-19T22:13:43.876412+00:00"
 }
