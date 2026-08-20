@@ -17,7 +17,7 @@
     for(const p of posts){
       const id=String(p.id);
       const manual=manualTranslations?.[id];
-      if(typeof manual==='string'&&manual.trim())p.ko=manual.trim();
+      p.ko=typeof manual==='string'?manual.trim():'';
       const synced=mediaMap?.[id];
       if(Array.isArray(synced)&&synced.length){p.media=synced;p.has_media=true;}
       else p.has_media=!!p.media?.length;
