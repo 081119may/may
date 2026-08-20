@@ -20,6 +20,7 @@ const css=`
 .info-pending{color:var(--muted);font-style:italic}
 .voice-transcript{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0e13}
 .voice-transcript.hidden{display:none!important}
+.voice-transcript-head{padding:12px 17px;border-bottom:1px solid var(--line);font-weight:900}
 .voice-transcript-row{padding:15px 17px}
 .voice-transcript-row+.voice-transcript-row{border-top:1px solid var(--line)}
 .voice-transcript-label{font-size:11px;font-weight:950;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
@@ -62,8 +63,8 @@ window.wireInfoFilters=function(){
 
 let transcriptPromise=null;
 function getVoiceTranscripts(){if(!transcriptPromise)transcriptPromise=fetch('data/voice-transcripts.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}));return transcriptPromise;}
-window.voiceTranscriptHtml=function(){return `<div id="voiceTranscript" class="voice-transcript hidden"><div class="voice-transcript-row"><div class="voice-transcript-label">日本語</div><div id="voiceTextJa" class="voice-transcript-text"></div></div><div class="voice-transcript-row ko"><div class="voice-transcript-label">한국어</div><div id="voiceTextKo" class="voice-transcript-text"></div></div></div>`};
-window.wireVoiceTranscript=function(){$$('.voice-row').forEach(btn=>btn.addEventListener('click',async()=>{const box=$('#voiceTranscript');if(!box)return;const data=await getVoiceTranscripts();const v=data[btn.dataset.id]||{};$('#voiceTextJa').textContent=v.ja||'';$('#voiceTextKo').textContent=v.ko||'';box.classList.toggle('hidden',!(v.ja||v.ko));}));};
+window.voiceTranscriptHtml=function(){return `<div id="voiceTranscript" class="voice-transcript hidden"><div id="voiceTranscriptHead" class="voice-transcript-head"></div><div class="voice-transcript-row"><div class="voice-transcript-label">日本語 原文</div><div id="voiceTextJa" class="voice-transcript-text"></div></div><div class="voice-transcript-row ko"><div class="voice-transcript-label">한국어 번역</div><div id="voiceTextKo" class="voice-transcript-text"></div></div></div>`};
+window.wireVoiceTranscript=function(){$$('.voice-row').forEach(btn=>btn.addEventListener('click',async()=>{const box=$('#voiceTranscript');if(!box)return;box.classList.remove('hidden');$('#voiceTranscriptHead').textContent=btn.querySelector('.voice-name')?.textContent||'VOICE SAMPLE';$('#voiceTextJa').textContent='대본 불러오는 중…';$('#voiceTextKo').textContent='번역 불러오는 중…';const data=await getVoiceTranscripts();const v=data[btn.dataset.id]||{};$('#voiceTextJa').textContent=v.ja||'대본 생성 대기 중';$('#voiceTextKo').textContent=v.ko||'번역 생성 대기 중';}));};
 
 window.renderProfile=function(){
  const p=state.profile;if(!p)return;applyManualInfo(p);const L=state.lang;
