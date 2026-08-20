@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
-UA='Mozilla/5.0 MayArchiveBot/5.1'
+UA='Mozilla/5.0 MayArchiveBot/5.2'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
@@ -76,22 +76,35 @@ def fetch_page(params):
     return get_json(url)
 
 def fetch_new(posts):
-    since=int(latest_epoch(posts));known={str(p.get('id')) for p in posts};found=[];cursor=None
-    for _ in range(5):
+    # FxTwitter's `since` filter and result ordering are not guaranteed to be
+    # perfectly chronological when replies/quotes are included.  Scan the
+    # recent timeline directly and filter locally so a known post near the top
+    # cannot make us stop before a newer unknown post.
+    known={str(p.get('id')) for p in posts}
+    latest=max(0,int(latest_epoch(posts)))
+    cutoff=max(0,latest-6*3600)
+    found=[];found_ids=set();cursor=None
+    for page in range(8):
         q={'count':'100','with_replies':'1'}
         if cursor:q['cursor']=cursor
-        elif since:q['since']=str(since)
-        data=fetch_page(q);results=[x for x in (data.get('results') or []) if isinstance(x,dict) and x.get('type')=='status']
+        data=fetch_page(q)
+        results=[x for x in (data.get('results') or []) if isinstance(x,dict) and x.get('id')]
         if not results:break
-        stop=False
+        oldest=None
         for x in results:
             tid=str(x.get('id') or '')
-            if tid in known:stop=True;continue
-            if tid and tid not in {str(y.get('id')) for y in found}:found.append(x)
-        if stop:break
+            created=parse_time(x.get('created_at') or x.get('created_timestamp')).timestamp()
+            oldest=created if oldest is None else min(oldest,created)
+            if tid in known or tid in found_ids:continue
+            # Restrict the no-since fallback to the recent window. This avoids
+            # importing historical holes while still catching today's posts.
+            if latest and created<cutoff:continue
+            found.append(x);found_ids.add(tid)
         cursor=(data.get('cursor') or {}).get('bottom')
         if not cursor:break
-        time.sleep(.2)
+        if latest and oldest is not None and oldest<cutoff:break
+        time.sleep(.25)
+    found.sort(key=lambda x:parse_time(x.get('created_at') or x.get('created_timestamp')).timestamp())
     return found
 
 def convert(x):
@@ -109,11 +122,11 @@ def convert(x):
 
 def main():
     m,posts=load_archive();new=fetch_new(posts)
-    print('archive',len(posts),'new X posts',len(new),'since',int(latest_epoch(posts)))
+    print('archive',len(posts),'new X posts',len(new),'latest_epoch',int(latest_epoch(posts)))
     if not new:
         print('No new posts; leaving repository unchanged.')
         return
-    posts.extend(convert(x) for x in reversed(new))
+    posts.extend(convert(x) for x in new)
     save_archive(m,posts)
 
 if __name__=='__main__':main()
