@@ -29,7 +29,20 @@ const css=`
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 
+let manualInfo={};
+function infoKey(x){return `${x.date||''}|${x.title_ja||''}`}
+function applyManualInfo(p){
+ if(!p||!Array.isArray(p.information))return p;
+ p.information=p.information.map(x=>Object.assign({},x,manualInfo[infoKey(x)]||{}));
+ return p;
+}
+fetch('data/manual-information-ko.json',{cache:'no-store'})
+ .then(r=>r.ok?r.json():{})
+ .then(data=>{manualInfo=data||{};if(state.profile){applyManualInfo(state.profile);renderProfile();}})
+ .catch(e=>console.warn('manual information translation load failed',e));
+
 window.informationHtml=function(p,L){
+ applyManualInfo(p);
  const items=(p.information||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
  const cats=['ALL','Media','Live','Other'];
  const filters=`<div class="info-filters">${cats.map((c,i)=>`<button type="button" class="info-filter${i?'':' active'}" data-info-cat="${c}">${c}</button>`).join('')}</div>`;
@@ -57,7 +70,7 @@ window.wireVoiceTranscript=function(){
 };
 
 window.renderProfile=function(){
- const p=state.profile;if(!p)return;const L=state.lang;
+ const p=state.profile;if(!p)return;applyManualInfo(p);const L=state.lang;
  const fields=(p.fields||[]).map(f=>`<div class="profile-field"><dt>${esc(f['label_'+L]||f.label_ja||'')}</dt><dd>${esc(f['value_'+L]||f.value_ja||'')}</dd></div>`).join('');
  $('#profileView').innerHTML=`<section class="profile-hero">${portraitHtml()}<div class="profile-copy"><div class="eyebrow">${esc(p['affiliation_'+L]||p.affiliation_ja||'')}</div><h1>${esc(p['name_'+L]||p.name_ja||'')}</h1><p class="romanized">${esc(p.romanized||'')}</p><span class="role-chip">${esc(p['occupation_'+L]||p.occupation_ja||'')}</span><a class="external-btn" href="${esc(p.source_url)}" target="_blank" rel="noopener">${t('openOfficial')}</a></div></section><dl class="profile-grid">${fields}</dl><section class="voice-section"><div class="section-heading"><div class="eyebrow">VOICE SAMPLE</div><h2>${t('voice')}</h2></div>${voiceHtml(p.voice_samples||[],L)}${voiceTranscriptHtml()}</section>${informationHtml(p,L)}`;
  loadPortrait();wireVoice();wireVoiceTranscript();wireInfoFilters();
