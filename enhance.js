@@ -17,6 +17,7 @@ const css=`
 .info-body{padding:0 4px 20px;color:#d9e0e7;border-top:0}
 .info-body p{white-space:pre-wrap;margin:0 0 12px;line-height:1.75}
 .info-body a{color:var(--accent2);font-weight:800;text-decoration:none}
+.info-pending{color:var(--muted);font-style:italic}
 .voice-transcript{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0e13}
 .voice-transcript.hidden{display:none!important}
 .voice-transcript-row{padding:15px 17px}
@@ -46,7 +47,12 @@ window.informationHtml=function(p,L){
  const items=(p.information||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
  const cats=['ALL','Media','Live','Other'];
  const filters=`<div class="info-filters">${cats.map((c,i)=>`<button type="button" class="info-filter${i?'':' active'}" data-info-cat="${c}">${c}</button>`).join('')}</div>`;
- const infos=items.map(x=>`<details class="info-item" data-info-type="${esc(x.type||'Other')}"><summary><div class="info-meta"><span class="info-type">${esc(x.type||'Other')}${x.subtype?` / ${esc(x.subtype)}`:''}</span><time>${esc(x.date||'')}</time></div><h3>${esc(x['title_'+L]||x.title_ja||'')}</h3></summary><div class="info-body"><p>${esc(x['body_'+L]||x.body_ja||'')}</p>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${t('detail')} ↗</a>`:''}</div></details>`).join('');
+ const infos=items.map(x=>{
+   const hasManual=!!manualInfo[infoKey(x)];
+   const title=L==='ko'?(hasManual?(x.title_ko||''):'번역 대기'):(x.title_ja||'');
+   const body=L==='ko'?(hasManual?(x.body_ko||''):''):(x.body_ja||'');
+   return `<details class="info-item" data-info-type="${esc(x.type||'Other')}"><summary><div class="info-meta"><span class="info-type">${esc(x.type||'Other')}${x.subtype?` / ${esc(x.subtype)}`:''}</span><time>${esc(x.date||'')}</time></div><h3 class="${L==='ko'&&!hasManual?'info-pending':''}">${esc(title)}</h3></summary><div class="info-body"><p>${esc(body)}</p>${x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${t('detail')} ↗</a>`:''}</div></details>`;
+ }).join('');
  const rel=(p.related_topics||[]).map(x=>`<a class="topic-card" href="${esc(x.url)}" target="_blank" rel="noopener"><time>${esc(x.date||'')}</time><strong>${esc(x['title_'+L]||x.title_ja||'')}</strong><span>↗</span></a>`).join('');
  return `<section class="information-section"><div class="section-heading"><div class="eyebrow">INFORMATION</div><h2>${t('information')}</h2></div>${filters}<div class="info-list">${infos}</div>${rel?`<div class="related-block"><h3>${t('related')}</h3><div class="topic-list">${rel}</div></div>`:''}</section>`;
 };
@@ -55,19 +61,9 @@ window.wireInfoFilters=function(){
 };
 
 let transcriptPromise=null;
-function getVoiceTranscripts(){
- if(!transcriptPromise) transcriptPromise=fetch('data/voice-transcripts.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}));
- return transcriptPromise;
-}
+function getVoiceTranscripts(){if(!transcriptPromise)transcriptPromise=fetch('data/voice-transcripts.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}));return transcriptPromise;}
 window.voiceTranscriptHtml=function(){return `<div id="voiceTranscript" class="voice-transcript hidden"><div class="voice-transcript-row"><div class="voice-transcript-label">日本語</div><div id="voiceTextJa" class="voice-transcript-text"></div></div><div class="voice-transcript-row ko"><div class="voice-transcript-label">한국어</div><div id="voiceTextKo" class="voice-transcript-text"></div></div></div>`};
-window.wireVoiceTranscript=function(){
- $$('.voice-row').forEach(btn=>btn.addEventListener('click',async()=>{
-   const box=$('#voiceTranscript'); if(!box)return;
-   const data=await getVoiceTranscripts(); const v=data[btn.dataset.id]||{};
-   $('#voiceTextJa').textContent=v.ja||''; $('#voiceTextKo').textContent=v.ko||'';
-   box.classList.toggle('hidden',!(v.ja||v.ko));
- }));
-};
+window.wireVoiceTranscript=function(){$$('.voice-row').forEach(btn=>btn.addEventListener('click',async()=>{const box=$('#voiceTranscript');if(!box)return;const data=await getVoiceTranscripts();const v=data[btn.dataset.id]||{};$('#voiceTextJa').textContent=v.ja||'';$('#voiceTextKo').textContent=v.ko||'';box.classList.toggle('hidden',!(v.ja||v.ko));}));};
 
 window.renderProfile=function(){
  const p=state.profile;if(!p)return;applyManualInfo(p);const L=state.lang;
