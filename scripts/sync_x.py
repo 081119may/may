@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
-UA='Mozilla/5.0 MayArchiveBot/5.0'
+UA='Mozilla/5.0 MayArchiveBot/5.1'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
@@ -34,13 +34,11 @@ def save_archive(m,posts):
     posts.sort(key=lambda x:x.get('date',''),reverse=True)
     raw=json.dumps(posts,ensure_ascii=False,separators=(',',':')).encode()
     (DATA/'archive-auto.b64').write_text(base64.b64encode(gzip.compress(raw,9)).decode(),'utf-8')
-    m.update({'format':'gzip-base64-parts','archive_parts':['data/archive-auto.b64'],'tweet_count':len(posts),'translation_count':sum(bool(MANUAL.get(str(p.get('id'))) or p.get('ko')) for p in posts),'full_archive_count':len(posts),'media_count':sum(len(p.get('media') or []) for p in posts),'media_base':'media_remote/','status':'auto','updated_at':dt.datetime.now(dt.timezone.utc).isoformat()})
+    translated=sum(bool(MANUAL.get(str(p.get('id')))) for p in posts)
+    pending=[{'id':str(p.get('id','')),'date':p.get('date',''),'ja':p.get('ja','')} for p in posts if (p.get('ja') or '').strip() and not MANUAL.get(str(p.get('id')))]
+    m.update({'format':'gzip-base64-parts','archive_parts':['data/archive-auto.b64'],'tweet_count':len(posts),'translation_count':translated,'full_archive_count':len(posts),'media_count':sum(len(p.get('media') or []) for p in posts),'media_base':'media_remote/','status':'auto','updated_at':dt.datetime.now(dt.timezone.utc).isoformat()})
     (DATA/'manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n','utf-8')
-    (DATA/'tweet_ids.txt').write_text('\n'.join(str(p['id']) for p in posts if p.get('id'))+'\n','utf-8')
-    # Human/manual translation review source. One tweet per line so it is easy to inspect in chunks.
-    with (DATA/'archive-review.jsonl').open('w',encoding='utf-8') as f:
-        for p in posts:
-            f.write(json.dumps({'id':str(p.get('id','')),'date':p.get('date',''),'ja':p.get('ja',''),'current_ko':MANUAL.get(str(p.get('id'))) or p.get('ko','')},ensure_ascii=False)+'\n')
+    (DATA/'x-translation-pending.json').write_text(json.dumps(pending,ensure_ascii=False,indent=2)+'\n','utf-8')
 
 def parse_time(v):
     if isinstance(v,(int,float)):return dt.datetime.fromtimestamp(v,dt.timezone.utc).astimezone(TOKYO)
@@ -107,14 +105,15 @@ def convert(x):
             if download(u,ROOT/rel):paths.append(rel)
         except Exception as e:print('media WARN',tid,repr(e))
     author=x.get('author') or {};text=(x.get('text') or '').strip()
-    # No automatic translation. New tweets enter with an empty Korean field until manually translated.
     return {'id':tid,'date':d.strftime('%Y-%m-%d %H:%M:%S'),'name':author.get('name') or '橘めい','handle':author.get('screen_name') or USERNAME,'ja':text,'ko':'','reply':x.get('replies',0) or 0,'retweet':x.get('reposts',0) or 0,'favorite':x.get('likes',0) or 0,'views':x.get('views',0) or 0,'has_media':bool(paths),'media':paths}
 
 def main():
     m,posts=load_archive();new=fetch_new(posts)
     print('archive',len(posts),'new X posts',len(new),'since',int(latest_epoch(posts)))
-    if new:posts.extend(convert(x) for x in reversed(new))
-    # Always regenerate review file so manual translation work sees the current archive.
+    if not new:
+        print('No new posts; leaving repository unchanged.')
+        return
+    posts.extend(convert(x) for x in reversed(new))
     save_archive(m,posts)
 
 if __name__=='__main__':main()
