@@ -21,9 +21,12 @@ jobs:
   sync:
     if: ${{ !contains(github.event.head_commit.message || '', 'Sync official voice samples and transcripts') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Fetch official Amuse voice files
         run: |
           python - <<'PY'
@@ -53,27 +56,39 @@ jobs:
               saved.append((name,str(p)))
           pathlib.Path('data/voice-map.json').write_text(json.dumps(dict(saved),ensure_ascii=False,separators=(',',':')))
           PY
-      - name: Transcribe Japanese and translate to Korean
+      - name: Install local speech recognizer
+        run: python -m pip install --disable-pip-version-check faster-whisper==1.1.1
+      - name: Transcribe Japanese locally
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          from faster_whisper import WhisperModel
+          mp=json.loads(pathlib.Path('data/voice-map.json').read_text())
+          try: out=json.loads(pathlib.Path('data/voice-transcripts.json').read_text())
+          except Exception: out={}
+          model=WhisperModel('base',device='cpu',compute_type='int8')
+          for ident,path in mp.items():
+              row=out.get(ident) if isinstance(out.get(ident),dict) else {}
+              if row.get('ja'):
+                  continue
+              segments,_=model.transcribe(path,language='ja',vad_filter=True,beam_size=5)
+              ja=''.join(s.text for s in segments).strip()
+              out[ident]={'ja':ja,'ko':row.get('ko','')}
+              print(ident,ja)
+          pathlib.Path('data/voice-transcripts.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          PY
+      - name: Translate transcripts to Korean when OpenAI secret is available
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python - <<'PY'
-          import json,os,pathlib,uuid,urllib.request
+          import json,os,pathlib,urllib.request
           key=os.getenv('OPENAI_API_KEY','').strip()
+          p=pathlib.Path('data/voice-transcripts.json')
+          out=json.loads(p.read_text())
           if not key:
-              print('OPENAI_API_KEY missing; skipping transcript generation.')
+              print('OPENAI_API_KEY missing; Japanese transcripts are still retained.')
               raise SystemExit(0)
-          mp=json.loads(pathlib.Path('data/voice-map.json').read_text())
-          try: out=json.loads(pathlib.Path('data/voice-transcripts.json').read_text())
-          except Exception: out={}
-          def transcribe(path):
-              b=pathlib.Path(path).read_bytes();boundary='----may'+uuid.uuid4().hex
-              chunks=[]
-              def field(name,val):chunks.extend([f'--{boundary}\r\n'.encode(),f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode(),str(val).encode(),b'\r\n'])
-              field('model','gpt-4o-mini-transcribe');field('language','ja');field('response_format','json')
-              chunks.extend([f'--{boundary}\r\n'.encode(),f'Content-Disposition: form-data; name="file"; filename="{pathlib.Path(path).name}"\r\n'.encode(),b'Content-Type: application/octet-stream\r\n\r\n',b,b'\r\n',f'--{boundary}--\r\n'.encode()])
-              req=urllib.request.Request('https://api.openai.com/v1/audio/transcriptions',data=b''.join(chunks),headers={'Authorization':f'Bearer {key}','Content-Type':f'multipart/form-data; boundary={boundary}'},method='POST')
-              with urllib.request.urlopen(req,timeout=120) as r:return json.load(r).get('text','').strip()
           def translate(text):
               body=json.dumps({'model':'gpt-5-mini','store':False,'input':[{'role':'developer','content':'일본어 음성 대본을 자연스러운 한국어로 번역하세요. 설명 없이 번역문만 출력하세요.'},{'role':'user','content':text}]},ensure_ascii=False).encode()
               req=urllib.request.Request('https://api.openai.com/v1/responses',data=body,headers={'Authorization':f'Bearer {key}','Content-Type':'application/json'},method='POST')
@@ -83,10 +98,11 @@ jobs:
                   for c in item.get('content',[]):
                       if c.get('type') in ('output_text','text') and c.get('text'):texts.append(c['text'])
               return '\n'.join(texts).strip()
-          for ident,path in mp.items():
-              if out.get(ident,{}).get('ja'):continue
-              ja=transcribe(path);out[ident]={'ja':ja,'ko':translate(ja) if ja else ''}
-          pathlib.Path('data/voice-transcripts.json').write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
+          changed=False
+          for ident,row in out.items():
+              if row.get('ja') and not row.get('ko'):
+                  row['ko']=translate(row['ja']);changed=True
+          if changed:p.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n')
           PY
       - name: Commit voice files and transcripts
         run: |
