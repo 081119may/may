@@ -19,15 +19,16 @@ const css=`
 .info-body a{color:var(--accent2);font-weight:800;text-decoration:none}
 .info-pending{color:var(--muted);font-style:italic}
 .voice-transcript{margin-top:16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0b0e13}
-.voice-transcript.hidden{display:none!important}
-.voice-transcript-head{padding:12px 17px;border-bottom:1px solid var(--line);font-weight:900}
+.voice-transcript-head{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 17px;border-bottom:1px solid var(--line);font-weight:900}
+.voice-transcript-refresh{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:6px 10px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
 .voice-transcript-row{padding:15px 17px}
 .voice-transcript-row+.voice-transcript-row{border-top:1px solid var(--line)}
 .voice-transcript-label{font-size:11px;font-weight:950;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
-.voice-transcript-text{white-space:pre-wrap;font-size:15px;line-height:1.75}
+.voice-transcript-text{white-space:pre-wrap;font-size:15px;line-height:1.75;min-height:1.75em}
 .voice-transcript-row.ko{background:#122034}
 .voice-transcript-row.ko .voice-transcript-label{color:#8ecbff}
-@media(max-width:720px){.info-item h3{font-size:16px}.voice-transcript-row{padding:13px}}
+.voice-row.transcript-selected{outline:2px solid #8ecbff;outline-offset:2px}
+@media(max-width:720px){.info-item h3{font-size:16px}.voice-transcript-row{padding:13px}.voice-transcript-head{padding:11px 13px}}
 `;
 const style=document.createElement('style');style.textContent=css;document.head.appendChild(style);
 
@@ -61,10 +62,36 @@ window.wireInfoFilters=function(){
  $$('.info-filter').forEach(btn=>btn.onclick=()=>{const c=btn.dataset.infoCat;$$('.info-filter').forEach(x=>x.classList.toggle('active',x===btn));$$('.info-item').forEach(x=>{x.hidden=c!=='ALL'&&x.dataset.infoType!==c});});
 };
 
-let transcriptPromise=null;
-function getVoiceTranscripts(){if(!transcriptPromise)transcriptPromise=fetch('data/voice-transcripts.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}));return transcriptPromise;}
-window.voiceTranscriptHtml=function(){return `<div id="voiceTranscript" class="voice-transcript hidden"><div id="voiceTranscriptHead" class="voice-transcript-head"></div><div class="voice-transcript-row"><div class="voice-transcript-label">日本語 原文</div><div id="voiceTextJa" class="voice-transcript-text"></div></div><div class="voice-transcript-row ko"><div class="voice-transcript-label">한국어 번역</div><div id="voiceTextKo" class="voice-transcript-text"></div></div></div>`};
-window.wireVoiceTranscript=function(){$$('.voice-row').forEach(btn=>btn.addEventListener('click',async()=>{const box=$('#voiceTranscript');if(!box)return;box.classList.remove('hidden');$('#voiceTranscriptHead').textContent=btn.querySelector('.voice-name')?.textContent||'VOICE SAMPLE';$('#voiceTextJa').textContent='대본 불러오는 중…';$('#voiceTextKo').textContent='번역 불러오는 중…';const data=await getVoiceTranscripts();const v=data[btn.dataset.id]||{};$('#voiceTextJa').textContent=v.ja||'대본 생성 대기 중';$('#voiceTextKo').textContent=v.ko||'번역 생성 대기 중';}));};
+let currentVoiceTranscriptId='';
+async function getVoiceTranscripts(){
+ try{
+   const r=await fetch(`data/voice-transcripts.json?t=${Date.now()}`,{cache:'no-store'});
+   return r.ok?await r.json():{};
+ }catch(e){console.warn('voice transcript load failed',e);return {}}
+}
+window.voiceTranscriptHtml=function(){return `<div id="voiceTranscript" class="voice-transcript"><div class="voice-transcript-head"><span id="voiceTranscriptHead">VOICE SAMPLE</span><button id="voiceTranscriptRefresh" type="button" class="voice-transcript-refresh">데이터 새로고침</button></div><div class="voice-transcript-row"><div class="voice-transcript-label">日本語 原文</div><div id="voiceTextJa" class="voice-transcript-text">대본 데이터를 불러오는 중…</div></div><div class="voice-transcript-row ko"><div class="voice-transcript-label">한국어 번역</div><div id="voiceTextKo" class="voice-transcript-text">번역 데이터를 불러오는 중…</div></div></div>`};
+async function showVoiceTranscript(btn){
+ const id=btn?.dataset?.id||currentVoiceTranscriptId;
+ if(!id)return;
+ currentVoiceTranscriptId=id;
+ $$('.voice-row').forEach(x=>x.classList.toggle('transcript-selected',x.dataset.id===id));
+ const selected=btn||$(`.voice-row[data-id="${id}"]`);
+ const head=$('#voiceTranscriptHead'),ja=$('#voiceTextJa'),ko=$('#voiceTextKo');
+ if(head)head.textContent=selected?.querySelector('.voice-name')?.textContent||id;
+ if(ja)ja.textContent='대본 데이터를 불러오는 중…';
+ if(ko)ko.textContent='번역 데이터를 불러오는 중…';
+ const data=await getVoiceTranscripts();
+ const v=data[id]||{};
+ if(ja)ja.textContent=(v.ja||'').trim()||'대본 생성 대기 중 — 자동 생성 작업이 완료되면 여기에 표시됩니다.';
+ if(ko)ko.textContent=(v.ko||'').trim()||'번역 생성 대기 중 — 자동 생성 작업이 완료되면 여기에 표시됩니다.';
+}
+window.wireVoiceTranscript=function(){
+ const rows=$$('.voice-row');
+ rows.forEach(btn=>btn.addEventListener('click',()=>showVoiceTranscript(btn)));
+ const refresh=$('#voiceTranscriptRefresh');
+ if(refresh)refresh.onclick=()=>showVoiceTranscript($(`.voice-row[data-id="${currentVoiceTranscriptId}"]`));
+ if(rows[0])showVoiceTranscript(rows[0]);
+};
 
 window.renderProfile=function(){
  const p=state.profile;if(!p)return;applyManualInfo(p);const L=state.lang;
