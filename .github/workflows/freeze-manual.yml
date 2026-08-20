@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/freeze_manual_translations.py'
       - 'scripts/fix_manual_datewars.py'
+      - 'scripts/fix_manual_residuals.py'
       - 'scripts/audit_x_translations.py'
       - '.github/workflows/freeze-manual.yml'
   workflow_dispatch:
@@ -30,6 +31,7 @@ jobs:
           python-version: '3.12'
       - run: python scripts/freeze_manual_translations.py
       - run: python scripts/fix_manual_datewars.py
+      - run: python scripts/fix_manual_residuals.py
       - run: python scripts/audit_x_translations.py
       - name: Commit frozen review data
         run: |
