@@ -3,10 +3,11 @@
     const m=await fetch('data/manifest.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(`manifest ${r.status}`);return r.json()});
     const files=m.archive_parts||[];
     if(!files.length)throw Error('archive parts missing');
-    const [parts,mediaMap,manualTranslations]=await Promise.all([
+    const [parts,mediaMap,manualTranslations,autoTranslations]=await Promise.all([
       Promise.all(files.map(u=>fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(`${u} ${r.status}`);return r.text()}))),
       fetch('data/media-map.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({})),
-      fetch('data/manual-translations.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
+      fetch('data/manual-translations.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch('data/auto-translations.json',{cache:'no-store'}).then(r=>r.ok?r.json():{}).catch(()=>({}))
     ]);
     const b64=parts.join('').replace(/\s/g,'');
     const raw=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
@@ -17,7 +18,8 @@
     for(const p of posts){
       const id=String(p.id);
       const manual=manualTranslations?.[id];
-      p.ko=typeof manual==='string'?manual.trim():'';
+      const auto=autoTranslations?.[id];
+      p.ko=typeof manual==='string'&&manual.trim()?manual.trim():(typeof auto==='string'?auto.trim():'');
       const synced=mediaMap?.[id];
       if(Array.isArray(synced)&&synced.length){p.media=synced;p.has_media=true;}
       else p.has_media=!!p.media?.length;
