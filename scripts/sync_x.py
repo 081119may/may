@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
-UA='Mozilla/5.0 MayArchiveBot/5.3'
+UA='Mozilla/5.0 MayArchiveBot/5.4'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
@@ -122,6 +122,16 @@ def glossary_text():
         if ja and ko:rows.append(f"{ja[0]} => {ko}")
     return '\n'.join(rows)
 
+def apply_glossary(source,ko):
+    out=ko
+    for item in GLOSSARY.get('terms') or []:
+        ja=item.get('ja') or [];target=item.get('ko') or ''
+        if not target or not any(term and term in source for term in ja):continue
+        aliases=list(item.get('aliases') or [])+ja
+        for alias in sorted(set(a for a in aliases if a),key=len,reverse=True):
+            out=out.replace(alias,target)
+    return out
+
 def openai_translate(text):
     key=os.getenv('OPENAI_API_KEY','').strip()
     if not key:return ''
@@ -138,18 +148,34 @@ def openai_translate(text):
             if c.get('type') in ('output_text','text') and c.get('text'):texts.append(c['text'])
     return '\n'.join(texts).strip()
 
+def google_translate(text):
+    try:
+        from deep_translator import GoogleTranslator
+        return (GoogleTranslator(source='ja',target='ko').translate(text) or '').strip()
+    except Exception as e:
+        print('google translation WARN',repr(e));return ''
+
+def translate_one(text):
+    ko=''
+    try:ko=openai_translate(text)
+    except Exception as e:print('openai translation WARN',repr(e))
+    if not ko:
+        for attempt in range(3):
+            ko=google_translate(text)
+            if ko:break
+            time.sleep(1.5*(attempt+1))
+    return apply_glossary(text,ko).strip() if ko else ''
+
 def translate_missing(posts):
-    if not os.getenv('OPENAI_API_KEY','').strip():
-        print('OPENAI_API_KEY missing; X translations cannot be generated automatically.')
-        return 0
     changed=0
     for p in sorted(posts,key=lambda x:x.get('date','')):
         tid=str(p.get('id',''));ja=(p.get('ja') or '').strip()
         if not ja or translated_for(tid):continue
-        try:
-            ko=openai_translate(ja)
-            if ko:AUTO[tid]=ko;changed+=1;print('translated',tid)
-        except Exception as e:print('translation WARN',tid,repr(e))
+        ko=translate_one(ja)
+        if ko:
+            AUTO[tid]=ko;changed+=1;print('translated',tid)
+        else:
+            print('translation FAILED',tid)
         time.sleep(.15)
     return changed
 
