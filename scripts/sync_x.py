@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import base64, datetime as dt, gzip, json, os, pathlib, time, urllib.error, urllib.parse, urllib.request
+import base64, datetime as dt, gzip, json, os, pathlib, re, time, urllib.error, urllib.parse, urllib.request
 from zoneinfo import ZoneInfo
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/'data'
 USERNAME=os.getenv('X_USERNAME','May_o_o_T')
-UA='Mozilla/5.0 MayArchiveBot/5.4'
+UA='Mozilla/5.0 MayArchiveBot/5.5'
 TOKYO=ZoneInfo('Asia/Tokyo')
 
 def read_json(path,default=None):
@@ -36,16 +36,20 @@ def load_archive():
     b64=''.join((ROOT/p).read_text('utf-8').strip() for p in parts)
     return m,json.loads(gzip.decompress(base64.b64decode(b64)).decode('utf-8'))
 
+def pending_rows(posts):
+    return [{'id':str(p.get('id','')),'date':p.get('date',''),'ja':p.get('ja','')} for p in posts if (p.get('ja') or '').strip() and not translated_for(p.get('id'))]
+
 def write_state(m,posts):
     posts.sort(key=lambda x:x.get('date',''),reverse=True)
     raw=json.dumps(posts,ensure_ascii=False,separators=(',',':')).encode()
     (DATA/'archive-auto.b64').write_text(base64.b64encode(gzip.compress(raw,9)).decode(),'utf-8')
+    pending=pending_rows(posts)
     translated=sum(bool(translated_for(p.get('id'))) for p in posts)
-    pending=[{'id':str(p.get('id','')),'date':p.get('date',''),'ja':p.get('ja','')} for p in posts if (p.get('ja') or '').strip() and not translated_for(p.get('id'))]
     m.update({'format':'gzip-base64-parts','archive_parts':['data/archive-auto.b64'],'tweet_count':len(posts),'translation_count':translated,'full_archive_count':len(posts),'media_count':sum(len(p.get('media') or []) for p in posts),'media_base':'media_remote/','status':'auto','updated_at':dt.datetime.now(dt.timezone.utc).isoformat()})
     (DATA/'manifest.json').write_text(json.dumps(m,ensure_ascii=False,indent=2)+'\n','utf-8')
     (DATA/'auto-translations.json').write_text(json.dumps(AUTO,ensure_ascii=False,indent=2)+'\n','utf-8')
     (DATA/'x-translation-pending.json').write_text(json.dumps(pending,ensure_ascii=False,indent=2)+'\n','utf-8')
+    return pending
 
 def parse_time(v):
     if isinstance(v,(int,float)):return dt.datetime.fromtimestamp(v,dt.timezone.utc).astimezone(TOKYO)
@@ -128,17 +132,13 @@ def apply_glossary(source,ko):
         ja=item.get('ja') or [];target=item.get('ko') or ''
         if not target or not any(term and term in source for term in ja):continue
         aliases=list(item.get('aliases') or [])+ja
-        for alias in sorted(set(a for a in aliases if a),key=len,reverse=True):
-            out=out.replace(alias,target)
+        for alias in sorted(set(a for a in aliases if a),key=len,reverse=True):out=out.replace(alias,target)
     return out
 
 def openai_translate(text):
     key=os.getenv('OPENAI_API_KEY','').strip()
     if not key:return ''
-    instructions=(
-      '일본어 X 게시물을 자연스러운 한국어로 번역하세요. 설명은 쓰지 말고 번역문만 출력하세요. '
-      'URL, 이모지, 줄바꿈, 해시태그의 의미를 가능한 한 보존하세요. 아래 용어표를 반드시 우선 적용하세요.\n'+glossary_text()
-    )
+    instructions=('일본어 X 게시물을 자연스러운 한국어로 번역하세요. 설명은 쓰지 말고 번역문만 출력하세요. URL, 이모지, 줄바꿈, 해시태그의 의미를 가능한 한 보존하세요. 아래 용어표를 반드시 우선 적용하세요.\n'+glossary_text())
     body=json.dumps({'model':os.getenv('OPENAI_TRANSLATE_MODEL','gpt-5-mini'),'store':False,'input':[{'role':'developer','content':instructions},{'role':'user','content':text}]},ensure_ascii=False).encode()
     req=urllib.request.Request('https://api.openai.com/v1/responses',data=body,headers={'Authorization':f'Bearer {key}','Content-Type':'application/json'},method='POST')
     with urllib.request.urlopen(req,timeout=120) as r:data=json.load(r)
@@ -148,23 +148,42 @@ def openai_translate(text):
             if c.get('type') in ('output_text','text') and c.get('text'):texts.append(c['text'])
     return '\n'.join(texts).strip()
 
-def google_translate(text):
-    try:
-        from deep_translator import GoogleTranslator
-        return (GoogleTranslator(source='ja',target='ko').translate(text) or '').strip()
-    except Exception as e:
-        print('google translation WARN',repr(e));return ''
+def google_gtx(text):
+    q=urllib.parse.urlencode({'client':'gtx','sl':'ja','tl':'ko','dt':'t','q':text})
+    req=urllib.request.Request('https://translate.googleapis.com/translate_a/single?'+q,headers={'User-Agent':UA})
+    with urllib.request.urlopen(req,timeout=45) as r:data=json.load(r)
+    return ''.join(part[0] or '' for part in (data[0] or []) if part).strip()
+
+def deep_translate(text):
+    from deep_translator import GoogleTranslator
+    return (GoogleTranslator(source='ja',target='ko').translate(text) or '').strip()
+
+def translate_lines(text,fn):
+    out=[]
+    for line in text.splitlines():
+        s=line.strip()
+        if not s or re.fullmatch(r'https?://\S+',s) or (s.startswith('#') and ' ' not in s):out.append(line);continue
+        try:v=fn(line)
+        except Exception as e:print(fn.__name__,'line WARN',repr(e));v=''
+        out.append(v or line)
+        time.sleep(.2)
+    result='\n'.join(out).strip()
+    return result if result and result!=text else ''
 
 def translate_one(text):
-    ko=''
-    try:ko=openai_translate(text)
-    except Exception as e:print('openai translation WARN',repr(e))
-    if not ko:
-        for attempt in range(3):
-            ko=google_translate(text)
-            if ko:break
-            time.sleep(1.5*(attempt+1))
-    return apply_glossary(text,ko).strip() if ko else ''
+    methods=[]
+    if os.getenv('OPENAI_API_KEY','').strip():methods.append(('openai',openai_translate))
+    methods += [('google-gtx',google_gtx),('deep-translator',deep_translate)]
+    for name,fn in methods:
+        for mode in ('whole','lines'):
+            for attempt in range(2):
+                try:ko=fn(text) if mode=='whole' else translate_lines(text,fn)
+                except Exception as e:print(name,mode,'WARN',repr(e));ko=''
+                if ko:
+                    print('translation method',name,mode)
+                    return apply_glossary(text,ko).strip()
+                time.sleep(1.0+attempt)
+    return ''
 
 def translate_missing(posts):
     changed=0
@@ -172,10 +191,8 @@ def translate_missing(posts):
         tid=str(p.get('id',''));ja=(p.get('ja') or '').strip()
         if not ja or translated_for(tid):continue
         ko=translate_one(ja)
-        if ko:
-            AUTO[tid]=ko;changed+=1;print('translated',tid)
-        else:
-            print('translation FAILED',tid)
+        if ko:AUTO[tid]=ko;changed+=1;print('translated',tid)
+        else:print('translation FAILED',tid)
         time.sleep(.15)
     return changed
 
@@ -185,8 +202,11 @@ def main():
     if new:posts.extend(convert(x) for x in new)
     translated=translate_missing(posts)
     if not new and not translated:
-        print('No new posts or translations; leaving repository unchanged.')
+        pending=pending_rows(posts)
+        if pending:print('translation still pending',len(pending))
+        else:print('No new posts or translations; leaving repository unchanged.')
         return
-    write_state(m,posts)
+    pending=write_state(m,posts)
+    print('pending translations',len(pending))
 
 if __name__=='__main__':main()
