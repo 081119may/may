@@ -216,6 +216,16 @@
   ],
   "information": [
     {
+      "type": "Media",
+      "subtype": "TV/WebTV",
+      "date": "2026-08-24",
+      "title_ja": "TOKYO MX・BSフジ　TVアニメ「てつりょー！meet with 鉄道むすめ」　出演決定",
+      "title_ko": "",
+      "body_ja": "TVアニメ「てつりょー！meet with 鉄道むすめ」\n2026年10月8日（木）　オンエアスタート\n＊毎週木曜日24:00～24:30\n＊主演：佐多みさき 役\n▽TVアニメ「魔法の姉妹ルルットリリィ」オフィシャルサイト\nhttps://tetsuryo-anime.com/\nオフィシャルX：https://x.com/tetsuryo_anime",
+      "body_ko": "",
+      "url": "https://tetsuryo-anime.com/"
+    },
+    {
       "type": "Live",
       "subtype": "Event",
       "date": "2026-06-15",
@@ -276,16 +286,6 @@
       "url": "https://www.amuse.co.jp/artist/A9019/"
     },
     {
-      "type": "Media",
-      "subtype": "TV/WebTV",
-      "date": "2025-12-11",
-      "title_ja": "TVアニメ「てつりょー！meet with 鉄道むすめ」　出演決定",
-      "title_ko": "",
-      "body_ja": "TVアニメ「てつりょー！meet with 鉄道むすめ」\n2026年　オンエアスタート\n＊放送チャンネル・放送時間は後日決定次第オフィシャルサイトで発表\n＊主演：佐多みさき 役\n▽TVアニメ「魔法の姉妹ルルットリリィ」オフィシャルサイト\nhttps://tetsuryo-anime.com/\nオフィシャルX：https://x.com/tetsuryo_anime",
-      "body_ko": "",
-      "url": "https://tetsuryo-anime.com/"
-    },
-    {
       "type": "Other",
       "subtype": "TICKET",
       "date": "2025-09-30",
@@ -325,5 +325,5 @@
     }
   ],
   "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
-  "auto_updated_at": "2026-08-24T03:41:33.888022+00:00"
+  "auto_updated_at": "2026-08-25T03:34:28.554652+00:00"
 }
