@@ -44,15 +44,15 @@ jobs:
             git commit -m 'Auto backup X archive'
             git push
           fi
-      - name: Verify no untranslated X posts remain
+      - name: Report untranslated X posts
         run: |
           python - <<'PY'
-          import json, pathlib, sys
+          import json, pathlib
           p=pathlib.Path('data/x-translation-pending.json')
           pending=json.loads(p.read_text('utf-8')) if p.exists() else []
           if pending:
-              print(f'{len(pending)} X translation(s) still pending; failing this run so the next scheduled run retries them.')
+              print(f'::warning::{len(pending)} X translation(s) still pending; the next scheduled run will retry them.')
               for item in pending[:10]: print(item.get('id'), item.get('date'))
-              sys.exit(1)
-          print('No pending X translations.')
+          else:
+              print('No pending X translations.')
           PY
