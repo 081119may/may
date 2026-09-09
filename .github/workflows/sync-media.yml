@@ -1,11 +1,6 @@
 name: Sync X media
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'data/tweet_ids.txt'
-      - '.github/workflows/sync-media.yml'
   workflow_dispatch:
   schedule:
     - cron: '17 3 * * *'
@@ -32,11 +27,32 @@ jobs:
           X_USERNAME: May_o_o_T
         run: |
           python - <<'PY'
-          import json, os, pathlib, time, urllib.parse, urllib.request
+          import base64, gzip, json, os, pathlib, time, urllib.parse, urllib.request
           root=pathlib.Path('.')
           out=root/'media_remote';out.mkdir(exist_ok=True)
           username=os.getenv('X_USERNAME','May_o_o_T')
-          wanted=set(x.strip() for x in (root/'data/tweet_ids.txt').read_text().splitlines() if x.strip())
+
+          def archived_ids():
+              legacy=root/'data/tweet_ids.txt'
+              if legacy.exists():
+                  return {x.strip() for x in legacy.read_text('utf-8').splitlines() if x.strip()}
+              manifest_path=root/'data/manifest.json'
+              if not manifest_path.exists():return set()
+              try:
+                  manifest=json.loads(manifest_path.read_text('utf-8'))
+                  parts=manifest.get('archive_parts') or []
+                  encoded=''.join((root/p).read_text('utf-8').strip() for p in parts)
+                  posts=json.loads(gzip.decompress(base64.b64decode(encoded)).decode('utf-8'))
+                  return {str(p.get('id')) for p in posts if p.get('id')}
+              except Exception as exc:
+                  print('::warning::Unable to read archived X post IDs:',repr(exc))
+                  return set()
+
+          wanted=archived_ids()
+          if not wanted:
+              print('No archived X post IDs found; nothing to backfill.')
+              raise SystemExit(0)
+          print('archived post IDs',len(wanted))
           map_path=root/'data/media-map.json'
           try: media_map=json.loads(map_path.read_text())
           except Exception: media_map={}
