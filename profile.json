@@ -216,6 +216,16 @@
   ],
   "information": [
     {
+      "type": "Live",
+      "subtype": "Event",
+      "date": "2026-09-27",
+      "title_ja": "一家Dumb Rock! 1st GIG「ピース＆グルーヴ」　出演決定",
+      "title_ko": "",
+      "body_ja": "一家Dumb Rock! 1st GIG「ピース＆グルーヴ」\n公演日：2026年12月12日（土）\n会場：duo MUSIC EXCHANGE\n出演：一家Dumb Rock!\nGt.＆Vo. 須賀蕾叶役　橘めい\nGt.＆Vo. 馬橋心玖役　涼泉桜花\n▽一家Dumb Rock! 1st GIG「ピース＆グルーヴ」オフィシャルサイト\nhttps://bang-dream.com/events/ikka-dumb-rock_1st/",
+      "body_ko": "",
+      "url": "https://bang-dream.com/events/ikka-dumb-rock_1st/"
+    },
+    {
       "type": "Media",
       "subtype": "TV/WebTV",
       "date": "2026-08-24",
@@ -305,5 +315,5 @@
     }
   ],
   "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
-  "auto_updated_at": "2026-09-27T05:52:11.692729+00:00"
+  "auto_updated_at": "2026-09-28T05:57:28.296770+00:00"
 }
