@@ -52,9 +52,12 @@ jobs:
           if missing:
               raise SystemExit(f'missing voice files: {missing}')
 
-          model = WhisperModel('base', device='cpu', compute_type='int8')
+          model = None
 
           def transcribe(path):
+              global model
+              if model is None:
+                  model = WhisperModel('base', device='cpu', compute_type='int8')
               segments, _ = model.transcribe(
                   str(path), language='ja', vad_filter=True, beam_size=5,
                   condition_on_previous_text=False
