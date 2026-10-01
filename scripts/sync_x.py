@@ -21,14 +21,23 @@ def translated_for(tid):
     return v.strip() if isinstance(v,str) else ''
 
 def get_json(url,timeout=45):
-    req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
-    try:
-        with urllib.request.urlopen(req,timeout=timeout) as r:
-            if r.status==204:return {'code':204,'results':[]}
-            return json.load(r)
-    except urllib.error.HTTPError as e:
-        if e.code==204:return {'code':204,'results':[]}
-        raise
+    for attempt in range(4):
+        req=urllib.request.Request(url,headers={'User-Agent':UA,'Accept':'application/json'})
+        try:
+            with urllib.request.urlopen(req,timeout=timeout) as r:
+                if r.status==204:return {'code':204,'results':[]}
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code==204:return {'code':204,'results':[]}
+            if e.code not in (404,429) and not 500<=e.code<=599:raise
+            error=e
+        except (urllib.error.URLError,TimeoutError,ConnectionError) as e:
+            error=e
+        if attempt==3:
+            raise RuntimeError(f'FxTwitter request failed after 4 attempts: {url}: {error}') from error
+        delay=2**attempt
+        print(f'FxTwitter request retry {attempt+1}/3 in {delay}s: {url}: {error!r}')
+        time.sleep(delay)
 
 def load_archive():
     m=read_json(DATA/'manifest.json',{}) or {};parts=m.get('archive_parts') or []
