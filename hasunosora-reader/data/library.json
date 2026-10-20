@@ -1,0 +1,12 @@
+{
+  "stories": [
+    {
+      "id": "album-tree",
+      "title": "극장판 소설",
+      "subtitle": "하스노소라 · 앨범 트리 이야기",
+      "data": "data/album-tree.json",
+      "pages": "2–31쪽",
+      "status": "번역 검수본"
+    }
+  ]
+}

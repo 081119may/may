@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffc0cb" />
+    <meta name="description" content="일본어 원문과 한국어 번역을 쪽별로 읽고 비교하는 소설 서가" />
+    <title>하스노소라 소설 서가</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600&family=Noto+Serif+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="하스노소라 소설 서가 홈">
+        <span class="brand-symbol" aria-hidden="true">✳</span>
+        <span class="brand-copy"><strong>하스노소라 소설 서가</strong><small>蓮ノ空 · NOVEL ARCHIVE</small></span>
+      </a>
+      <div class="header-right"><span class="header-rule"></span><span lang="ja">今この瞬間を大切に</span></div>
+    </header>
+
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="소설 목록">
+        <div class="sidebar-heading"><span class="eyebrow">YOUR LIBRARY</span><span class="side-flower" aria-hidden="true">✻</span></div>
+        <h2>소설 목록</h2>
+        <p class="sidebar-hint">이야기를 골라 읽어보세요.</p>
+        <nav id="story-list" class="story-list" aria-label="소설 선택"></nav>
+        <div class="sidebar-foot"><span class="mini-mark" aria-hidden="true">✳</span><p lang="ja">蓮ノ空女学院</p></div>
+      </aside>
+
+      <main class="main-area" id="main">
+        <section class="intro" aria-labelledby="intro-title">
+          <div class="intro-ornament" aria-hidden="true"><span>✳</span><span>✳</span><span>✳</span></div>
+          <div class="intro-content">
+            <span class="eyebrow intro-eyebrow">THE STORY COLLECTION <span class="eyebrow-line"></span> 01</span>
+            <h1 id="intro-title">극장판 소설</h1>
+          </div>
+          <div class="intro-note"><span class="intro-note-line"></span><span>SCROLL TO READ</span><span class="intro-note-arrow">↓</span></div>
+        </section>
+
+        <section class="reader" aria-labelledby="story-title">
+          <div class="reader-overline"><span>SELECTED STORY</span><span id="story-counter">01 / 01</span></div>
+          <div class="reader-title-row">
+            <div><span class="story-kicker">蓮ノ空 · ORIGINAL & TRANSLATION</span><h2 id="story-title">소설을 불러오는 중</h2><p id="story-subtitle"></p></div>
+            <span class="reader-seal" aria-hidden="true">✳</span>
+          </div>
+
+          <div class="reader-toolbar" id="reader-toolbar">
+            <fieldset class="mode-switch" aria-label="읽기 방식"><legend>읽기 방식</legend>
+              <button type="button" data-mode="original" aria-pressed="false">원문</button>
+              <button type="button" data-mode="translation" aria-pressed="false">번역문</button>
+              <button type="button" data-mode="parallel" aria-pressed="true">나란히 비교</button>
+            </fieldset>
+            <div class="toolbar-right"><label for="page-jump">쪽 이동</label><select id="page-jump" aria-label="읽을 쪽으로 이동"></select><span id="page-total" class="page-total"></span></div>
+          </div>
+          <p class="source-note" id="source-note">원문은 제공받은 사진에서 옮긴 일본어 텍스트입니다. 번역문은 검수용 초안입니다.</p>
+          <div id="story-content" class="story-content" aria-live="polite"></div>
+          <div class="reader-end"><span>✳</span><p>여기까지 읽으셨습니다.</p><button id="back-to-top" type="button">처음으로 ↑</button></div>
+        </section>
+        <footer class="site-footer"><span>蓮ノ空 · NOVEL ARCHIVE</span><span>이야기는 계속됩니다.</span></footer>
+      </main>
+    </div>
+    <button class="mobile-library" id="mobile-library" type="button" aria-controls="sidebar" aria-expanded="false">☰ <span>소설 목록</span></button>
+    <div id="mobile-backdrop" class="mobile-backdrop" hidden></div>
+  </body>
+</html>
