@@ -266,16 +266,6 @@
       "url": "https://virtualgirl.bushiroad.com/news/post-19/"
     },
     {
-      "type": "Media",
-      "subtype": "TV/WebTV",
-      "date": "2026-03-13",
-      "title_ja": "TOKYO MX　TVアニメ「魔法の姉妹ルルットリリィ」　出演決定",
-      "title_ko": "",
-      "body_ja": "TOKYO MX　TVアニメ「魔法の姉妹ルルットリリィ」\n2026年4月5日（日）　オンエアスタート\n＊毎週日曜日22:30～\n＊主演：野々山 風&こんぺとリリィ 役\n▽TVアニメ「魔法の姉妹ルルットリリィ」オフィシャルサイト\nhttps://www.luluttolilly.com\nオフィシャルX：https://x.com/luluttolilly",
-      "body_ko": "",
-      "url": "https://www.luluttolilly.com"
-    },
-    {
       "type": "Live",
       "subtype": "Event",
       "date": "2026-01-19",
@@ -325,5 +315,5 @@
     }
   ],
   "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
-  "auto_updated_at": "2026-10-20T05:24:40.761087+00:00"
+  "auto_updated_at": "2026-10-21T05:22:58.583915+00:00"
 }
