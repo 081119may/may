@@ -3,11 +3,11 @@
   "archive_parts": [
     "data/archive-auto.b64"
   ],
-  "tweet_count": 724,
+  "tweet_count": 727,
   "translation_count": 721,
-  "full_archive_count": 724,
-  "media_count": 458,
+  "full_archive_count": 727,
+  "media_count": 466,
   "media_base": "media_remote/",
   "status": "auto",
-  "updated_at": "2026-10-23T15:00:51.357988+00:00"
+  "updated_at": "2026-10-25T14:23:41.141132+00:00"
 }
