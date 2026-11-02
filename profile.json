@@ -217,6 +217,16 @@
   "information": [
     {
       "type": "Live",
+      "subtype": "Event",
+      "date": "2026-11-02",
+      "title_ja": "「LISANI！TOKYO 2027」　出演決定",
+      "title_ko": "",
+      "body_ja": "「LISANI！TOKYO 2027」\n出演日：2027年2月20日（土）\n開場：15:00　開演：16:00（予定）\n会場：TOYOTA ARENA TOKYO\n＊SATURDAY STAGEにBanG Dream!一家Dumb Rock! 須賀 蕾叶役として出演\n▽「LISANI！TOKYO 2027」オフィシャルサイト\nhttps://www.lisani.jp/live/",
+      "body_ko": "",
+      "url": "https://www.lisani.jp/live/"
+    },
+    {
+      "type": "Live",
       "subtype": "",
       "date": "2026-10-10",
       "title_ja": "「millsage×一家Dumb Rock! SPECIAL LIVE」　出演決定",
@@ -315,5 +325,5 @@
     }
   ],
   "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
-  "auto_updated_at": "2026-11-01T06:54:48.995277+00:00"
+  "auto_updated_at": "2026-11-02T06:56:15.223988+00:00"
 }
