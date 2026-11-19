@@ -29,8 +29,8 @@
     {
       "label_ja": "年齢",
       "label_ko": "나이",
-      "value_ja": "17歳",
-      "value_ko": "17세"
+      "value_ja": "18歳",
+      "value_ko": "18세"
     },
     {
       "label_ja": "出身地",
@@ -325,5 +325,5 @@
     }
   ],
   "event_source_url": "https://www.eventernote.com/actors/%E6%A9%98%E3%82%81%E3%81%84/78099/events",
-  "auto_updated_at": "2026-11-18T07:59:51.577249+00:00"
+  "auto_updated_at": "2026-11-19T08:02:10.832296+00:00"
 }
